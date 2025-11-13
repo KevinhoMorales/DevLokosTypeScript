@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     url: "https://devlokos.com",
     images: [
       {
-        url: "/logo-transparent.png",
+        url: "/logo.png",
         width: 1200,
         height: 630,
         alt: "DevLokos - Comunidad de Desarrolladores Latinoamérica",
@@ -80,7 +80,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "DevLokos - Comunidad de Desarrolladores Latinoamérica",
     description: "Construimos comunidad, conocimiento y tecnología desde Latinoamérica",
-    images: ["/logo-transparent.png"],
+    images: ["/logo.png"],
   },
   alternates: {
     canonical: "https://devlokos.com",
