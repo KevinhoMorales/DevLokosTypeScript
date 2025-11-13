@@ -51,6 +51,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://devlokos.com'),
   title: "DevLokos - Comunidad de Desarrolladores Latinoamérica",
   description: "DevLokos es una comunidad para desarrolladores y creadores tech que quieren aprender, conectar y construir desde Latinoamérica. Podcast, academia, contenido gratuito y más.",
   keywords: "DevLokos, comunidad de desarrolladores, tecnología, Latinoamérica, podcast, academia, contenido tech, programación, desarrollo web, JavaScript, React, Node.js, TypeScript",
@@ -64,12 +65,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_ES",
     siteName: "DevLokos",
+    url: "https://devlokos.com",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/logo-transparent.png",
         width: 1200,
         height: 630,
         alt: "DevLokos - Comunidad de Desarrolladores Latinoamérica",
+        type: "image/png",
       },
     ],
   },
@@ -77,10 +80,16 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "DevLokos - Comunidad de Desarrolladores Latinoamérica",
     description: "Construimos comunidad, conocimiento y tecnología desde Latinoamérica",
-    images: ["/og-image.jpg"],
+    images: ["/logo-transparent.png"],
   },
   alternates: {
     canonical: "https://devlokos.com",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.png", sizes: "256x256", type: "image/png" },
+      { url: "/icon.png", sizes: "280x280", type: "image/png" },
+    ],
   },
 };
 
