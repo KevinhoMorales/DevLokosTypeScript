@@ -38,6 +38,7 @@ export default function PodcastSection() {
   const { ref: searchRef, isVisible: searchVisible } = useScrollAnimation({ threshold: 0.2 });
   const [episodes, setEpisodes] = useState<PodcastEpisode[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedEpisode, setSelectedEpisode] = useState<PodcastEpisode | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,13 +48,27 @@ export default function PodcastSection() {
     // Fetch episodes from API
     const fetchEpisodes = async () => {
       try {
+        setError(null);
+        setLoading(true);
         const response = await fetch('/api/episodes');
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Error desconocido' }));
+          const errorMessage = errorData.error || errorData.details || `Error ${response.status}: ${response.statusText}`;
+          throw new Error(errorMessage);
+        }
+        
         const data = await response.json();
-        if (data.episodes) {
+        if (data.episodes && Array.isArray(data.episodes)) {
           setEpisodes(data.episodes);
+          setError(null);
+        } else {
+          throw new Error('Formato de datos inválido');
         }
       } catch (error) {
         console.error('Error fetching episodes:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Error al cargar los episodios. Por favor, intenta más tarde.';
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -190,6 +205,50 @@ export default function PodcastSection() {
                   </div>
                 </div>
               ))}
+            </div>
+          ) : error ? (
+            <div className="text-center py-16 md:py-20 w-full transition-all duration-1000 opacity-100">
+              <div className="bg-red-900/20 border border-red-800 rounded-2xl p-8 md:p-12 max-w-2xl mx-auto">
+                <div className="mb-4">
+                  <svg className="w-16 h-16 mx-auto text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-white mb-4">
+                  Error al cargar episodios
+                </h3>
+                <p className="text-white/70 text-sm md:text-base mb-6 break-words">
+                  {error}
+                </p>
+                <button
+                  onClick={() => {
+                    setLoading(true);
+                    setError(null);
+                    fetch('/api/episodes')
+                      .then(res => {
+                        if (!res.ok) {
+                          return res.json().then(err => Promise.reject(new Error(err.error || err.details || 'Error desconocido')));
+                        }
+                        return res.json();
+                      })
+                      .then(data => {
+                        if (data.episodes && Array.isArray(data.episodes)) {
+                          setEpisodes(data.episodes);
+                          setError(null);
+                        } else {
+                          throw new Error('Formato de datos inválido');
+                        }
+                      })
+                      .catch(err => {
+                        setError(err.message || 'Error al cargar los episodios');
+                      })
+                      .finally(() => setLoading(false));
+                  }}
+                  className="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-colors"
+                >
+                  Intentar de nuevo
+                </button>
+              </div>
             </div>
                   ) : (
                     <>

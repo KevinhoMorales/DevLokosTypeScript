@@ -108,7 +108,11 @@ export async function getYouTubePlaylistVideos(
 /**
  * Convierte una duración ISO 8601 a formato legible (ej: PT1H9M30S -> "1 h 9 min")
  */
-function formatDuration(isoDuration: string): string {
+function formatDuration(isoDuration: string | undefined | null): string {
+  if (!isoDuration) {
+    return '0 min';
+  }
+
   const regex = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
   const matches = isoDuration.match(regex);
 
