@@ -45,7 +45,7 @@ export async function getYouTubeApiKey(paramName: string = 'youtube_api_key'): P
 
   try {
     // Fetch y activar los valores de Remote Config
-    await remoteConfig.fetchAndActivate();
+    await (remoteConfig as any).fetchAndActivate();
     
     // Obtener el valor del parámetro
     const configValue = getValue(remoteConfig, paramName);

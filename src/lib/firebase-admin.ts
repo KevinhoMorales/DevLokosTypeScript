@@ -30,7 +30,7 @@ function getAdminApp(): admin.app.App {
     });
   }
 
-  return adminApp;
+  return adminApp!;
 }
 
 /**
@@ -59,14 +59,14 @@ export async function getYouTubeApiKeyFromRemoteConfig(
     let value: string | undefined;
 
     if (parameter.defaultValue) {
-      value = parameter.defaultValue.value;
+      value = (parameter.defaultValue as any).value || parameter.defaultValue;
     }
 
     // Si hay valores condicionales, usar el primero disponible
     if (!value && parameter.conditionalValues) {
       const firstConditional = Object.values(parameter.conditionalValues)[0];
       if (firstConditional) {
-        value = firstConditional.value;
+        value = (firstConditional as any).value || firstConditional;
       }
     }
 
