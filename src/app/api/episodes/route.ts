@@ -21,7 +21,19 @@ const SPOTIFY_SHOW_URL = 'https://open.spotify.com/show/3u6neVhqqDc693wTS16v1r?s
 export async function GET() {
   try {
     // Obtener el API key de YouTube desde Firebase Remote Config
-    const youtubeApiKey = await getYouTubeApiKeyFromRemoteConfig('youtube_api_key');
+    // Prioridad: Firebase Remote Config > Variable de entorno (fallback)
+    let youtubeApiKey: string;
+    
+    try {
+      youtubeApiKey = await getYouTubeApiKeyFromRemoteConfig('youtube_api_key');
+    } catch (firebaseError) {
+      console.error('Error obteniendo API key desde Firebase Remote Config:', firebaseError);
+      // Fallback: usar variable de entorno si está disponible
+      youtubeApiKey = process.env.YOUTUBE_API_KEY || '';
+      if (!youtubeApiKey) {
+        throw new Error('No se pudo obtener YouTube API Key. Verifica que Firebase Admin SDK esté configurado o configura YOUTUBE_API_KEY en .env.local');
+      }
+    }
     
     // Obtener TODOS los videos de la playlist de YouTube (carga de 50 en 50)
     const youtubeVideos = await getYouTubePlaylistVideos(
