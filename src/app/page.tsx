@@ -41,16 +41,12 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <div className="relative flex min-h-screen w-full max-w-full flex-col overflow-x-hidden items-center">
-        <div className="w-full max-w-full flex h-full flex-col items-center">
-          <NavBar />
-          <main className="w-full max-w-full flex flex-col items-center">
-            <HeroSection />
-            <PodcastSection />
-            <Footer />
-          </main>
-        </div>
-      </div>
+      <main className="min-h-screen bg-black text-white selection:bg-orange-500/30">
+        <NavBar />
+        <HeroSection />
+        <PodcastSection />
+        <Footer />
+      </main>
     </>
   );
 }
