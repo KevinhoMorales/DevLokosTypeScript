@@ -2,17 +2,21 @@
 
 import type React from "react"
 import { useState } from 'react';
-import { Facebook, Instagram, Linkedin, Mail, Music2, Twitter, Youtube } from "lucide-react"
-import Link from "next/link"
+import { Instagram, Linkedin, Mail, Music2, Youtube } from "lucide-react"
 import { Logo } from "@/components/Logo"
 import PrivacyPolicyModal from './PrivacyPolicyModal';
 import TermsModal from './TermsModal';
 
 function SocialLink({ href, icon }: { href: string; icon: React.ReactNode }) {
   return (
-    <Link href={href} className="text-zinc-400 hover:text-white hover:scale-110 transition-all duration-200">
+    <a 
+      href={href} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="text-zinc-400 hover:text-white hover:scale-110 transition-all duration-200"
+    >
       {icon}
-    </Link>
+    </a>
   )
 }
 
@@ -51,15 +55,11 @@ export default function Footer() {
             <p className="text-zinc-400 text-sm">¿Preguntas o comentarios? Nos encantaría escucharte.</p>
 
             <div className="flex flex-wrap gap-4">
-              <SocialLink href="https://instagram.com/devlokos" icon={<Instagram className="w-5 h-5" />} />
-              <SocialLink href="https://facebook.com/devlokos" icon={<Facebook className="w-5 h-5" />} />
               <SocialLink href="https://youtube.com/@devlokos" icon={<Youtube className="w-5 h-5" />} />
-              <SocialLink href="https://x.com/devlokos" icon={<Twitter className="w-5 h-5" />} />
+              <SocialLink href="https://open.spotify.com/show/3u6neVhqqDc693wTS16v1r?si=7FteYjGURHSzSxLtIHM6qg" icon={<Music2 className="w-5 h-5" />} />
+              <SocialLink href="https://instagram.com/devlokos" icon={<Instagram className="w-5 h-5" />} />
               <SocialLink href="https://linkedin.com/company/devlokos" icon={<Linkedin className="w-5 h-5" />} />
               <SocialLink href="https://tiktok.com/@devlokos" icon={<Music2 className="w-5 h-5" />} />
-              <SocialLink href="https://twitch.tv/devlokos" icon={<Music2 className="w-5 h-5" />} />
-              <SocialLink href="https://discord.gg/devlokos" icon={<Music2 className="w-5 h-5" />} />
-              <SocialLink href="https://open.spotify.com/show/3u6neVhqqDc693wTS16v1r?si=7FteYjGURHSzSxLtIHM6qg" icon={<Music2 className="w-5 h-5" />} />
             </div>
 
             <div className="flex items-center gap-2 text-zinc-400 text-sm hover:text-white transition-colors">

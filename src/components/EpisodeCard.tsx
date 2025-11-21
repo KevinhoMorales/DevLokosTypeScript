@@ -31,16 +31,36 @@ export function EpisodeCard({
       onClick={onClick}
       className={`flex flex-col rounded-xl overflow-hidden bg-[#0A0A0A] border border-white/5 group cursor-pointer ${className}`}
     >
-      {/* Top Half - Orange Background with Image */}
-      <div className="relative h-48 bg-[#F97316] overflow-hidden">
-        {/* Pattern Overlay */}
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' fill='%23000000' fillOpacity='0.4' fillRule='evenodd'/%3E%3C/svg%3E")`,
-            backgroundSize: "30px 30px",
-          }}
-        />
+      {/* Top Half - Episode Thumbnail/Portada - Full Size */}
+      <div className="relative h-64 bg-[#F97316] overflow-hidden group/thumbnail">
+        {/* Episode Thumbnail as Full Background */}
+        {image && image !== "/placeholder.svg" ? (
+          <>
+            <Image 
+              src={image} 
+              alt={guest || title} 
+              fill 
+              className="object-cover group-hover/thumbnail:scale-105 transition-transform duration-500"
+              unoptimized
+              priority
+            />
+            {/* Dark Overlay for better text readability */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
+            {/* Orange tint overlay - subtle */}
+            <div className="absolute inset-0 bg-[#F97316]/15 group-hover/thumbnail:bg-[#F97316]/5 transition-colors duration-300" />
+          </>
+        ) : (
+          /* Fallback orange background with pattern */
+          <>
+            <div
+              className="absolute inset-0 opacity-20"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' fill='%23000000' fillOpacity='0.4' fillRule='evenodd'/%3E%3C/svg%3E")`,
+                backgroundSize: "30px 30px",
+              }}
+            />
+          </>
+        )}
 
         {/* Duration Badge */}
         <div className="absolute top-3 right-3 z-10">
@@ -49,29 +69,14 @@ export function EpisodeCard({
           </span>
         </div>
 
-        {/* Centered Guest Image & Play Button */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative">
-            <div className="relative w-24 h-24 rounded-xl overflow-hidden border-4 border-black/10 shadow-xl">
-              <Image 
-                src={image || "/placeholder.svg"} 
-                alt={guest || title} 
-                fill 
-                className="object-cover"
-                unoptimized
-              />
-            </div>
-
-            {/* Play Button Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                className="bg-white rounded-full p-3 shadow-lg cursor-pointer z-20"
-              >
-                <Play className="w-6 h-6 text-[#F97316] fill-[#F97316] ml-1" />
-              </motion.div>
-            </div>
-          </div>
+        {/* Play Button Overlay - Centered and Larger */}
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <motion.div
+            whileHover={{ scale: 1.15 }}
+            className="bg-white/95 rounded-full p-5 shadow-2xl cursor-pointer backdrop-blur-sm border-2 border-white/30"
+          >
+            <Play className="w-10 h-10 text-[#F97316] fill-[#F97316] ml-1" />
+          </motion.div>
         </div>
       </div>
 

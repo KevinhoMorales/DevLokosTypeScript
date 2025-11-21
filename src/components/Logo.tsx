@@ -1,4 +1,4 @@
-import { Mic } from "lucide-react"
+import Image from "next/image"
 
 interface LogoProps {
   className?: string
@@ -12,18 +12,27 @@ export function Logo({ className = "", size = "sm" }: LogoProps) {
     <div className={`flex items-center gap-2 font-bold ${className}`}>
       {isLarge ? (
         <div className="relative flex items-center justify-center">
-          <div className="relative h-24 w-24 bg-orange-500 rounded-lg flex items-center justify-center transform rotate-3">
-            <Mic className="h-12 w-12 text-white" />
+          <div className="relative h-24 w-auto">
+            <Image
+              src="/logo-transparent.png"
+              alt="DevLokos Logo"
+              width={200}
+              height={80}
+              className="h-full w-auto object-contain"
+              priority
+            />
           </div>
         </div>
       ) : (
-        <div className="flex items-center gap-2">
-          <div className="relative h-8 w-8 bg-orange-500 rounded-lg flex items-center justify-center transform rotate-3">
-            <Mic className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-white tracking-tight">
-            Dev<span className="text-orange-500">Lokos</span>
-          </span>
+        <div className="relative h-8 w-auto">
+          <Image
+            src="/logo-transparent.png"
+            alt="DevLokos Logo"
+            width={120}
+            height={32}
+            className="h-full w-auto object-contain"
+            priority
+          />
         </div>
       )}
     </div>
