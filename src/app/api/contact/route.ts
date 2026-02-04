@@ -48,8 +48,9 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         access_key: apiKey,
         subject: `Nuevo proyecto: ${n}`,
-        name: n,
+        from_name: n,
         email: e,
+        name: n,
         phone: p,
         company: c,
         project_type: projectType,
@@ -65,8 +66,16 @@ export async function POST(request: NextRequest) {
       console.error('contact: Web3Forms devolvió no-JSON', res.status, text.slice(0, 200));
       const msg = res.status === 403
         ? 'El servicio de envío no está disponible temporalmente (acceso bloqueado). Intenta más tarde.'
-        : 'Error al enviar el mensaje. Intenta más tarde.';
-      return NextResponse.json({ error: msg }, { status: 500 });
+        : res.status === 429
+          ? 'Demasiados envíos. Espera un momento e intenta de nuevo.'
+          : 'Error al enviar el mensaje. Intenta más tarde.';
+      return NextResponse.json({ error: msg }, { status: res.status === 429 ? 429 : 500 });
+    }
+    if (res.status === 429) {
+      return NextResponse.json(
+        { error: data.message || 'Demasiados envíos. Espera un momento e intenta de nuevo.' },
+        { status: 429 }
+      );
     }
     if (!res.ok) {
       return NextResponse.json({ error: data.message || 'Error al enviar' }, { status: 500 });

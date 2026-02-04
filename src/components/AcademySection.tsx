@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { BookOpen, Check, ChevronDown } from 'lucide-react';
+import Image from 'next/image';
+import { BookOpen, Check, ChevronDown, X, Clock, Layers, MessageCircle } from 'lucide-react';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionIntro } from '@/components/ui/SectionIntro';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -11,6 +12,30 @@ import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
 const WHATSAPP_NUMBER = '593939598029';
+
+function formatDuration(minutes: number | undefined): string {
+  if (!minutes || minutes <= 0) return '';
+  if (minutes < 60) return `${minutes} min`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m ? `${h} h ${m} min` : `${h} h`;
+}
+
+function difficultyLabel(d: string | undefined): string {
+  const v = (d || '').toLowerCase();
+  if (v === 'beginner') return 'Principiante';
+  if (v === 'intermediate') return 'Intermedio';
+  if (v === 'advanced') return 'Avanzado';
+  return d || '—';
+}
+
+function difficultyBadgeClass(d: string | undefined): string {
+  const v = (d || '').toLowerCase();
+  if (v === 'beginner') return 'bg-green-500/20 text-green-400 border-green-500/30';
+  if (v === 'intermediate') return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+  if (v === 'advanced') return 'bg-red-500/20 text-red-400 border-red-500/30';
+  return 'bg-zinc-500/20 text-zinc-400 border-zinc-500/30';
+}
 
 function normalize(s: string): string {
   return s
@@ -215,48 +240,121 @@ export default function AcademySection() {
         )}
 
         {selectedCourse && (
-          <div
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
             onClick={() => setSelectedCourse(null)}
           >
-            <div
-              className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-[#0D0D0D] rounded-2xl border border-white/10 p-6"
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ type: 'tween', duration: 0.2 }}
+              className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#0D0D0D] rounded-2xl border border-white/10 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => setSelectedCourse(null)}
-                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
+                className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
                 aria-label="Cerrar"
               >
-                ×
+                <X className="w-5 h-5" />
               </button>
-              <h3 className="text-xl font-bold text-white pr-10 mb-4">{selectedCourse.title}</h3>
-              {selectedCourse.description && (
-                <p className="text-zinc-400 text-sm mb-4">{selectedCourse.description}</p>
-              )}
-              {(selectedCourse.learningObjectives ?? []).length > 0 && (
-                <div className="mb-4">
-                  <h4 className="text-white font-semibold text-sm mb-2">Qué aprenderás</h4>
-                  <ul className="space-y-1">
-                    {(selectedCourse.learningObjectives ?? []).map((obj, i) => (
-                      <li key={i} className="flex items-start gap-2 text-zinc-400 text-sm">
-                        <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                        {obj}
-                      </li>
-                    ))}
-                  </ul>
+
+              {selectedCourse.thumbnailUrl && (
+                <div className="relative w-full h-44 sm:h-52 bg-zinc-900 rounded-t-2xl overflow-hidden">
+                  <Image
+                    src={selectedCourse.thumbnailUrl}
+                    alt={selectedCourse.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 672px) 100vw, 672px"
+                    unoptimized
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-transparent to-transparent opacity-80" />
                 </div>
               )}
-              <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 w-full justify-center py-3 px-4 bg-primary hover:bg-primary/90 text-white font-medium rounded-xl transition-colors"
-              >
-                Inscribirme por WhatsApp
-              </a>
-            </div>
-          </div>
+
+              <div className="p-6 sm:p-8">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  {selectedCourse.difficulty && (
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${difficultyBadgeClass(selectedCourse.difficulty)}`}>
+                      {difficultyLabel(selectedCourse.difficulty)}
+                    </span>
+                  )}
+                  {selectedCourse.duration && selectedCourse.duration > 0 && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white/10 text-zinc-400 border border-white/10">
+                      <Clock className="w-3.5 h-3.5" />
+                      {formatDuration(selectedCourse.duration)}
+                    </span>
+                  )}
+                  {(selectedCourse.modules?.length ?? 0) > 0 && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white/10 text-zinc-400 border border-white/10">
+                      <Layers className="w-3.5 h-3.5" />
+                      {selectedCourse.modules!.length} módulos
+                    </span>
+                  )}
+                </div>
+
+                <h2 className="text-xl sm:text-2xl font-bold text-white pr-10 mb-4">{selectedCourse.title}</h2>
+
+                {selectedCourse.learningPaths && selectedCourse.learningPaths.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {selectedCourse.learningPaths.map((path) => (
+                      <span key={path} className="px-2.5 py-1 bg-primary/15 text-primary rounded-lg text-xs font-medium border border-primary/30">
+                        {path}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {selectedCourse.description && (
+                  <p className="text-zinc-400 text-sm sm:text-base leading-relaxed mb-6">{selectedCourse.description}</p>
+                )}
+
+                {(selectedCourse.learningObjectives ?? []).length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-white font-semibold text-sm mb-3">Qué aprenderás</h3>
+                    <ul className="space-y-2">
+                      {(selectedCourse.learningObjectives ?? []).map((obj, i) => (
+                        <li key={i} className="flex items-start gap-2 text-zinc-400 text-sm">
+                          <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                          <span>{obj}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {(selectedCourse.modules?.length ?? 0) > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-white font-semibold text-sm mb-3">Contenido del curso</h3>
+                    <ol className="space-y-2">
+                      {selectedCourse.modules!.map((mod, i) => (
+                        <li key={i} className="flex items-center gap-2 text-zinc-400 text-sm">
+                          <span className="flex w-6 h-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-medium text-zinc-400">
+                            {i + 1}
+                          </span>
+                          {mod.title ?? `Módulo ${i + 1}`}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+
+                <a
+                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 w-full py-3.5 px-5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-colors"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Inscribirme por WhatsApp
+                </a>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
     </section>
   );

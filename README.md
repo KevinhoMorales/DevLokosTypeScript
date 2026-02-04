@@ -134,7 +134,7 @@ Copia `.env.example` a `.env.local` y rellena los valores. Para la sección **Tu
 
 - `YOUTUBE_API_KEY` – API Key de Google Cloud (YouTube Data API v3 habilitada).
 - Uno de: `YOUTUBE_CHANNEL_ID`, `YOUTUBE_TUTORIALS_PLAYLIST_ID` o `YOUTUBE_PLAYLIST_ID` (playlist principal; si no hay playlist de tutoriales se usa esta y se muestran sus vídeos como chips).
-- `WEB3FORMS_ACCESS_KEY` – (Opcional.) Para el formulario de Empresarial. La clave se lee primero de Remote Config (`web_3_form`); si no está, se usa esta variable. Clave en [web3forms.com](https://web3forms.com).
+- `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` – (Opcional, recomendado.) Para el formulario de Empresarial. El envío se hace desde el navegador y así se evita el 403 de Cloudflare. Clave en [web3forms.com](https://web3forms.com). Alternativa desde servidor: `WEB3FORMS_ACCESS_KEY` o Remote Config (`web_3_form`); requiere plan de pago y whitelist de IP.
 
 Reinicia el servidor de desarrollo (`npm run dev`) después de cambiar variables de entorno.
 

@@ -82,7 +82,87 @@ export default function EnterpriseSection() {
     e.preventDefault();
     setFormError(null);
     setFormLoading(true);
-    fetch('/api/contact', {
+
+    const n = form.name.trim();
+    const email = form.email.trim();
+    const phone = form.phone.trim();
+    const company = form.company.trim();
+    const projectType = form.projectType?.trim() || '';
+    const message = form.message.trim();
+
+    if (!n || !email || !phone || !company || !projectType || !message) {
+      setFormError('Completa todos los campos.');
+      setFormLoading(false);
+      return;
+    }
+    if (!PROJECT_TYPES.includes(projectType)) {
+      setFormError('Selecciona un tipo de proyecto válido.');
+      setFormLoading(false);
+      return;
+    }
+
+    const formattedMessage = [
+      `Nombre: ${n}`,
+      `Email: ${email}`,
+      `Teléfono: ${phone}`,
+      `Empresa: ${company}`,
+      `Tipo de proyecto: ${projectType}`,
+      '',
+      message,
+    ].join('\n');
+
+    const web3Payload = {
+      access_key: '',
+      subject: `Nuevo proyecto: ${n}`,
+      from_name: n,
+      email,
+      name: n,
+      phone,
+      company,
+      project_type: projectType,
+      message: formattedMessage,
+    };
+
+    const doClientSubmit = (accessKey: string) => {
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...web3Payload, access_key: accessKey }),
+      })
+        .then(async (r) => {
+          const text = await r.text();
+          let data: { success?: boolean; message?: string };
+          try {
+            data = JSON.parse(text);
+          } catch {
+            setFormError(r.status === 403 ? 'El envío fue bloqueado. Intenta más tarde.' : 'Error al enviar. Intenta más tarde.');
+            return;
+          }
+          if (!data.success) throw new Error(data.message || 'Error al enviar');
+          setFormSent(true);
+          setForm({ name: '', email: '', phone: '', company: '', projectType: '', message: '' });
+        })
+        .catch((err) => setFormError(err instanceof Error ? err.message : 'Error al enviar'))
+        .finally(() => setFormLoading(false));
+    };
+
+    const clientKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY?.trim();
+    if (clientKey) {
+      doClientSubmit(clientKey);
+      return;
+    }
+
+    fetch('/api/contact/config')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('No config'))))
+      .then((data: { accessKey?: string }) => {
+        if (data?.accessKey?.trim()) {
+          doClientSubmit(data.accessKey.trim());
+        } else {
+          throw new Error('No config');
+        }
+      })
+      .catch(() => {
+        fetch('/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -107,7 +187,7 @@ export default function EnterpriseSection() {
         return data;
       })
       .then((data) => {
-        if (data.error) throw new Error(data.error);
+        if (data?.error) throw new Error(data.error);
         setFormSent(true);
         setForm({ name: '', email: '', phone: '', company: '', projectType: '', message: '' });
       })
@@ -116,7 +196,7 @@ export default function EnterpriseSection() {
         if (msg === 'Formulario no configurado') {
           const base = 'En este momento no podemos recibir mensajes por este formulario. Por favor intenta más tarde o contacta por otro medio.';
           const devHint = typeof window !== 'undefined' && window.location.hostname === 'localhost'
-            ? ' Para activarlo: configura web_3_form en Firebase Remote Config o WEB3FORMS_ACCESS_KEY en .env.local y reinicia el servidor.'
+            ? ' Configura web_3_form en Firebase Remote Config o WEB3FORMS_ACCESS_KEY en .env.local y reinicia.'
             : '';
           setFormError(base + devHint);
         } else {
@@ -124,6 +204,7 @@ export default function EnterpriseSection() {
         }
       })
       .finally(() => setFormLoading(false));
+      });
   };
 
   return (
@@ -155,8 +236,8 @@ export default function EnterpriseSection() {
         <div className="max-w-xl mx-auto mb-16">
           <h3 className="text-xl font-semibold text-white mb-6 text-center">Inicia un proyecto</h3>
           {formSent ? (
-            <div className="text-center py-8 rounded-2xl bg-green-500/10 border border-green-500/30">
-              <p className="text-green-400 font-medium">Mensaje enviado correctamente.</p>
+            <div className="text-center py-8 rounded-2xl bg-primary/10 border border-primary/30">
+              <p className="text-primary font-medium">Mensaje enviado correctamente.</p>
               <p className="text-zinc-400 text-sm mt-1">Te responderemos pronto.</p>
             </div>
           ) : (
