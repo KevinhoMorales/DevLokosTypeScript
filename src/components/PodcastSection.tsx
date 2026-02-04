@@ -21,7 +21,14 @@ interface PodcastEpisode {
   guest?: string
   quote?: string
   date?: string
+  /** 1 o 2 (Temporada 1 / Temporada 2), según título en YouTube. */
+  season?: 1 | 2
 }
+
+const SEASON_OPTIONS = [
+  { value: 'Temporada 1', label: 'Temporada 1', season: 1 as const },
+  { value: 'Temporada 2', label: 'Temporada 2', season: 2 as const },
+] as const
 
 // Función para extraer el video ID de una URL de YouTube
 function getYouTubeVideoId(url: string): string | null {
@@ -44,6 +51,7 @@ export default function PodcastSection() {
   const [error, setError] = useState<string | null>(null)
   const [selectedEpisode, setSelectedEpisode] = useState<PodcastEpisode | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedSeason, setSelectedSeason] = useState<'Temporada 1' | 'Temporada 2'>('Temporada 2')
   const [currentPage, setCurrentPage] = useState(1)
   const episodesPerPage = 6
 
@@ -80,8 +88,10 @@ export default function PodcastSection() {
     fetchEpisodes()
   }, [])
 
-  // Filtrar episodios según la búsqueda (título e invitado, sin tildes) — declarado antes de useEffects que lo usan
-  const filteredEpisodes = episodes.filter(episode => {
+  // Filtrar por temporada (S1/S2 desde API) y luego por búsqueda
+  const seasonNum = selectedSeason === 'Temporada 2' ? 2 : 1
+  const episodesBySeason = episodes.filter(ep => (ep.season ?? 2) === seasonNum)
+  const filteredEpisodes = episodesBySeason.filter(episode => {
     const searchNormalized = normalizeText(searchQuery)
     const titleNormalized = normalizeText(episode.title)
     const guestNormalized = episode.guest ? normalizeText(episode.guest) : ''
@@ -120,10 +130,10 @@ export default function PodcastSection() {
     }
   }, [selectedEpisode])
 
-  // Resetear a la primera página cuando cambia la búsqueda
+  // Resetear a la primera página cuando cambia la búsqueda o la temporada
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchQuery])
+  }, [searchQuery, selectedSeason])
 
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => {
@@ -263,6 +273,20 @@ export default function PodcastSection() {
       {/* Episodes Grid */}
       {!loading && !error && (
         <>
+          <div className="flex justify-end mb-6">
+            <select
+              value={selectedSeason}
+              onChange={(e) => setSelectedSeason(e.target.value as 'Temporada 1' | 'Temporada 2')}
+              className="bg-[#0D0D0D] border border-white/10 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent cursor-pointer min-w-[180px]"
+              aria-label="Filtrar por temporada"
+            >
+              {SEASON_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
           {paginatedEpisodes.length > 0 ? (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -13,6 +13,8 @@ interface PodcastEpisode {
   guest?: string;
   quote?: string;
   date?: string;
+  /** 1 o 2 según si el título del video en YouTube contiene "S1" o "S2" (por defecto 2). */
+  season: 1 | 2;
 }
 
 const YOUTUBE_PLAYLIST_ID = 'PLPXi7Vgl6Ak-Bm8Y2Xxhp1dwrzWT3AbjZ';
@@ -41,6 +43,10 @@ export async function GET() {
       youtubeApiKey
     );
 
+    // Determinar temporada por título del video (S1 / S2); por defecto Temporada 2
+    const seasonFromTitle = (rawTitle: string): 1 | 2 =>
+      rawTitle.includes('S2') ? 2 : rawTitle.includes('S1') ? 1 : 2;
+
     // Convertir los videos de YouTube al formato de episodios
     const episodes: PodcastEpisode[] = youtubeVideos.map((video, index) => {
       // Extraer información del título (formato: "DevLokos S2 Ep078 || Título || Invitado")
@@ -63,6 +69,7 @@ export async function GET() {
         duration: video.duration,
         guest: guest,
         date: video.publishedAt.split('T')[0], // Solo la fecha sin la hora
+        season: seasonFromTitle(video.title),
       };
     });
 
