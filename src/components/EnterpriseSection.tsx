@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
+import { analyticsEvents } from '@/lib/analytics';
 import { Search, Palette, Code, Rocket, Check, Briefcase, FolderOpen } from 'lucide-react';
 import { SectionIntro } from '@/components/ui/SectionIntro';
 import { Button } from '@/components/ui/button';
@@ -78,6 +79,22 @@ export default function EnterpriseSection() {
       .finally(() => setLoading(false));
   }, []);
 
+  const enterpriseViewedRef = useRef(false);
+  useEffect(() => {
+    if (!loading && !enterpriseViewedRef.current) {
+      enterpriseViewedRef.current = true;
+      analyticsEvents.enterprise_viewed();
+    }
+  }, [loading]);
+
+  const contactStartedRef = useRef(false);
+  const handleContactFocus = () => {
+    if (!contactStartedRef.current) {
+      contactStartedRef.current = true;
+      analyticsEvents.enterprise_contact_started();
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
@@ -139,6 +156,7 @@ export default function EnterpriseSection() {
             return;
           }
           if (!data.success) throw new Error(data.message || 'Error al enviar');
+          analyticsEvents.enterprise_contact_submitted(true);
           setFormSent(true);
           setForm({ name: '', email: '', phone: '', company: '', projectType: '', message: '' });
         })
@@ -188,6 +206,7 @@ export default function EnterpriseSection() {
       })
       .then((data) => {
         if (data?.error) throw new Error(data.error);
+        analyticsEvents.enterprise_contact_submitted(true);
         setFormSent(true);
         setForm({ name: '', email: '', phone: '', company: '', projectType: '', message: '' });
       })
@@ -247,6 +266,7 @@ export default function EnterpriseSection() {
                   required
                   id="contact-name"
                   value={form.name}
+                  onFocus={handleContactFocus}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   placeholder="Nombre *"
                   className="bg-[#0D0D0D] border-white/10 text-white placeholder:text-zinc-500 h-11"

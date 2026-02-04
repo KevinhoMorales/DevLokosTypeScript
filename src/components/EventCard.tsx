@@ -33,9 +33,10 @@ interface EventCardProps {
   event: EventCardData;
   onShare?: (event: EventCardData) => void;
   onClick?: (event: EventCardData) => void;
+  onRegisterClick?: (event: EventCardData) => void;
 }
 
-export function EventCard({ event, onShare, onClick }: EventCardProps) {
+export function EventCard({ event, onShare, onClick, onRegisterClick }: EventCardProps) {
   const locationText = [event.city, event.location].filter(Boolean).join(' · ') || '';
 
   return (
@@ -84,7 +85,10 @@ export function EventCard({ event, onShare, onClick }: EventCardProps) {
               href={event.registrationUrl}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onRegisterClick?.(event);
+              }}
               className="inline-flex items-center justify-center py-1.5 px-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg text-xs transition-colors"
             >
               Registrarme

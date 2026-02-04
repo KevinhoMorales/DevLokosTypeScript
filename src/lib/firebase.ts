@@ -1,7 +1,8 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
+import { getAnalytics, Analytics } from 'firebase/analytics';
 import { getRemoteConfig, getValue, RemoteConfig } from 'firebase/remote-config';
 
-// Configuración de Firebase
+// Configuración de Firebase (apiKey es obligatorio para inicializar)
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "devlokos.firebaseapp.com",
@@ -12,15 +13,24 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-X7DLGDN6HV",
 };
 
-// Inicializar Firebase solo una vez
+const hasFirebaseConfig =
+  typeof firebaseConfig.apiKey === 'string' && firebaseConfig.apiKey.length > 0;
+
+// Inicializar Firebase solo cuando hay credenciales (evita "Missing apiKey")
 let app: FirebaseApp | undefined;
-if (typeof window !== 'undefined' && getApps().length === 0) {
-  app = initializeApp(firebaseConfig);
-} else if (getApps().length > 0) {
-  app = getApps()[0];
+let analytics: Analytics | undefined;
+
+if (typeof window !== 'undefined' && hasFirebaseConfig) {
+  if (getApps().length === 0) {
+    app = initializeApp(firebaseConfig);
+    analytics = getAnalytics(app);
+  } else {
+    app = getApps()[0] as FirebaseApp;
+    analytics = getAnalytics(app);
+  }
 }
 
-// Obtener Remote Config
+// Obtener Remote Config solo si Firebase está inicializado
 let remoteConfig: RemoteConfig | undefined;
 
 if (typeof window !== 'undefined' && app) {
@@ -61,5 +71,5 @@ export async function getYouTubeApiKey(paramName: string = 'youtube_api_key'): P
   }
 }
 
-export { app };
+export { app, analytics };
 

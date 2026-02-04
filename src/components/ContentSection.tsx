@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Video } from 'lucide-react';
+import { analyticsEvents } from '@/lib/analytics';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionIntro } from '@/components/ui/SectionIntro';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -72,6 +73,14 @@ export default function ContentSection() {
     fetchPlaylists();
   }, []);
 
+  const tutorialsViewedRef = useRef(false);
+  useEffect(() => {
+    if (!loadingPlaylists && playlists.length > 0 && !tutorialsViewedRef.current) {
+      tutorialsViewedRef.current = true;
+      analyticsEvents.tutorials_home_viewed();
+    }
+  }, [loadingPlaylists, playlists.length]);
+
   useEffect(() => {
     if (!selectedPlaylistId) {
       setTutorials([]);
@@ -94,6 +103,24 @@ export default function ContentSection() {
     : tutorials;
 
   const selectedPlaylist = playlists.find((p) => p.id === selectedPlaylistId);
+
+  useEffect(() => {
+    if (!selectedPlaylistId || !selectedPlaylist) return;
+    analyticsEvents.tutorial_playlist_selected(selectedPlaylistId, selectedPlaylist.title);
+  }, [selectedPlaylistId]);
+
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!search.trim()) return;
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => {
+      analyticsEvents.tutorial_searched(search, filteredTutorials.length);
+      searchDebounceRef.current = null;
+    }, 600);
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    };
+  }, [search, filteredTutorials.length]);
 
   useEffect(() => {
     const onEscape = (e: KeyboardEvent) => {
@@ -169,7 +196,10 @@ export default function ContentSection() {
               {playlists.map((p) => (
                 <button
                   key={p.id}
-                  onClick={() => setSelectedPlaylistId(p.id)}
+                  onClick={() => {
+                    setSelectedPlaylistId(p.id);
+                    analyticsEvents.playlist_chip_selected(p.id, p.title);
+                  }}
                   className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
                     selectedPlaylistId === p.id
                       ? 'bg-primary text-white border border-primary'
@@ -245,7 +275,16 @@ export default function ContentSection() {
                       thumbnailUrl={t.thumbnailUrl}
                       publishedAt={t.publishedAt}
                       playlistTitle={selectedPlaylist?.title}
-                      onClick={() => setSelectedTutorial(t)}
+                      onClick={() => {
+                        setSelectedTutorial(t);
+                        analyticsEvents.tutorial_video_viewed({
+                          video_id: t.videoId,
+                          video_title: t.title,
+                          playlist_id: selectedPlaylistId ?? undefined,
+                          playlist_title: selectedPlaylist?.title,
+                        });
+                        analyticsEvents.tutorial_video_played(t.videoId, t.title);
+                      }}
                     />
                   </motion.div>
                 ))}

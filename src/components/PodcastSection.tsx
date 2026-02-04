@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Search } from "lucide-react"
+import { analyticsEvents } from '@/lib/analytics'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { SectionIntro } from "@/components/ui/SectionIntro"
@@ -79,6 +80,25 @@ export default function PodcastSection() {
     fetchEpisodes()
   }, [])
 
+  // Filtrar episodios según la búsqueda (título e invitado, sin tildes) — declarado antes de useEffects que lo usan
+  const filteredEpisodes = episodes.filter(episode => {
+    const searchNormalized = normalizeText(searchQuery)
+    const titleNormalized = normalizeText(episode.title)
+    const guestNormalized = episode.guest ? normalizeText(episode.guest) : ''
+    const titleMatch = titleNormalized.includes(searchNormalized)
+    const guestMatch = guestNormalized.includes(searchNormalized)
+    return titleMatch || guestMatch
+  })
+
+  const podcastViewedRef = useRef(false)
+  useEffect(() => {
+    if (loading || error) return
+    if (!podcastViewedRef.current && episodes.length >= 0) {
+      podcastViewedRef.current = true
+      analyticsEvents.podcast_home_viewed()
+    }
+  }, [loading, error, episodes.length])
+
   // Cerrar modal con ESC
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -105,15 +125,18 @@ export default function PodcastSection() {
     setCurrentPage(1)
   }, [searchQuery])
 
-  // Filtrar episodios según la búsqueda (título e invitado, sin tildes)
-  const filteredEpisodes = episodes.filter(episode => {
-    const searchNormalized = normalizeText(searchQuery)
-    const titleNormalized = normalizeText(episode.title)
-    const guestNormalized = episode.guest ? normalizeText(episode.guest) : ''
-    const titleMatch = titleNormalized.includes(searchNormalized)
-    const guestMatch = guestNormalized.includes(searchNormalized)
-    return titleMatch || guestMatch
-  })
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    if (!searchQuery.trim()) return
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
+    searchDebounceRef.current = setTimeout(() => {
+      analyticsEvents.search_performed(searchQuery, 'podcast', filteredEpisodes.length)
+      searchDebounceRef.current = null
+    }, 600)
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
+    }
+  }, [searchQuery, filteredEpisodes.length])
 
   // Calcular paginación
   const totalPages = Math.ceil(filteredEpisodes.length / episodesPerPage)
@@ -123,6 +146,12 @@ export default function PodcastSection() {
 
   const handleEpisodeClick = (episode: PodcastEpisode) => {
     setSelectedEpisode(episode)
+    analyticsEvents.podcast_episode_viewed({
+      episode_id: String(episode.id),
+      episode_title: episode.title,
+      source: 'discover',
+    })
+    analyticsEvents.podcast_episode_played(String(episode.id), episode.title)
   }
 
   const closeModal = () => {

@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { BookOpen, Check, ChevronDown, X, Clock, Layers, MessageCircle } from 'lucide-react';
+import { analyticsEvents } from '@/lib/analytics';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionIntro } from '@/components/ui/SectionIntro';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -65,6 +66,14 @@ export default function AcademySection() {
       .catch((e) => setError(e instanceof Error ? e.message : 'Error'))
       .finally(() => setLoading(false));
   }, []);
+
+  const academyViewedRef = useRef(false);
+  useEffect(() => {
+    if (!loading && courses.length >= 0 && !academyViewedRef.current) {
+      academyViewedRef.current = true;
+      analyticsEvents.academy_home_viewed();
+    }
+  }, [loading, courses.length]);
 
   const learningPaths = useMemo(() => {
     const set = new Set<string>();
@@ -171,7 +180,14 @@ export default function AcademySection() {
               <div className="relative inline-flex items-center">
                 <select
                   value={filterPath}
-                  onChange={(e) => setFilterPath(e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setFilterPath(v);
+                    if (v) {
+                      analyticsEvents.learning_path_selected(v, 'academy');
+                      analyticsEvents.filter_applied('learning_path', v, 'academy');
+                    }
+                  }}
                   className={`appearance-none border rounded-full pl-5 pr-10 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none cursor-pointer ${
                     filterPath
                       ? 'bg-primary text-white border-primary'
@@ -190,7 +206,13 @@ export default function AcademySection() {
               <div className="relative inline-flex items-center">
                 <select
                   value={filterDifficulty}
-                  onChange={(e) => setFilterDifficulty(e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setFilterDifficulty(v);
+                    if (v) {
+                      analyticsEvents.filter_applied('difficulty', v, 'academy');
+                    }
+                  }}
                   className={`appearance-none border rounded-full pl-5 pr-10 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none cursor-pointer ${
                     filterDifficulty
                       ? 'bg-primary text-white border-primary'
@@ -231,7 +253,18 @@ export default function AcademySection() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.04 }}
                   >
-                    <CourseCard course={course} onClick={() => setSelectedCourse(course)} />
+                    <CourseCard
+                      course={course}
+                      onClick={() => {
+                        setSelectedCourse(course);
+                        analyticsEvents.course_viewed({
+                          course_id: course.id,
+                          course_title: course.title,
+                          level: course.difficulty,
+                          learning_paths: course.learningPaths?.join(', '),
+                        });
+                      }}
+                    />
                   </motion.div>
                 ))}
               </div>
@@ -347,6 +380,7 @@ export default function AcademySection() {
                   href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => analyticsEvents.academy_whatsapp_clicked(selectedCourse.title)}
                   className="inline-flex items-center justify-center gap-2 w-full py-3.5 px-5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-colors"
                 >
                   <MessageCircle className="w-5 h-5" />

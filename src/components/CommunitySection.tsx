@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { Calendar, MapPin, X } from 'lucide-react';
+import { analyticsEvents } from '@/lib/analytics';
 import { EventCard, type EventCardData, formatEventDate } from '@/components/EventCard';
 import { SectionIntro } from '@/components/ui/SectionIntro';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -51,7 +52,27 @@ export default function CommunitySection() {
     };
   }, [selectedEvent]);
 
+  const eventsListViewedRef = useRef(false);
+  const hasEvents = upcoming.length > 0 || past.length > 0;
+  useEffect(() => {
+    if (!loading && hasEvents && !eventsListViewedRef.current) {
+      eventsListViewedRef.current = true;
+      analyticsEvents.events_list_viewed();
+    }
+  }, [loading, hasEvents]);
+
+  const handleSelectEvent = (event: EventCardData) => {
+    setSelectedEvent(event);
+    analyticsEvents.event_viewed({
+      event_id: event.id,
+      event_title: event.title,
+      city: event.city,
+      has_registration_link: !!event.registrationUrl,
+    });
+  };
+
   const handleShare = (event: EventCardData) => {
+    analyticsEvents.event_shared(event.id, event.title);
     const url = typeof window !== 'undefined' ? window.location.href : '';
     const text = `${event.title} - ${event.eventDate}`;
     if (navigator.share) {
@@ -65,7 +86,9 @@ export default function CommunitySection() {
     }
   };
 
-  const hasEvents = upcoming.length > 0 || past.length > 0;
+  const handleRegisterClick = (event: EventCardData) => {
+    analyticsEvents.event_register_clicked(event.id, event.title);
+  };
 
   return (
     <section id="events-section" className={`${SECTION_CONTAINER} bg-black`}>
@@ -139,7 +162,7 @@ export default function CommunitySection() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.05 }}
                     >
-                      <EventCard event={event} onShare={handleShare} onClick={setSelectedEvent} />
+                      <EventCard event={event} onShare={handleShare} onClick={handleSelectEvent} onRegisterClick={handleRegisterClick} />
                     </motion.div>
                   ))}
                 </div>
@@ -157,7 +180,7 @@ export default function CommunitySection() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.05 }}
                     >
-                      <EventCard event={event} onShare={handleShare} onClick={setSelectedEvent} />
+                      <EventCard event={event} onShare={handleShare} onClick={handleSelectEvent} onRegisterClick={handleRegisterClick} />
                     </motion.div>
                   ))}
                 </div>
@@ -230,6 +253,7 @@ export default function CommunitySection() {
                     href={selectedEvent.registrationUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => handleRegisterClick(selectedEvent)}
                     className="inline-flex items-center justify-center w-full py-3.5 px-5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-colors"
                   >
                     Registrarme
