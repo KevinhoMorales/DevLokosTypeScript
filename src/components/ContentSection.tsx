@@ -1,310 +1,260 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { Video } from 'lucide-react';
+import { SearchBar } from '@/components/ui/SearchBar';
+import { SectionIntro } from '@/components/ui/SectionIntro';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { TutorialCard } from '@/components/TutorialCard';
+import { Button } from '@/components/ui/button';
+import { SECTION_CONTAINER } from '@/lib/section-layout';
+import { motion } from 'framer-motion';
 
-interface ContentItem {
-  id: number;
+interface Playlist {
+  id: string;
   title: string;
-  description: string;
-  type: 'tutorial' | 'video' | 'mini-course' | 'coding-exercise';
-  difficulty: 'Principiante' | 'Intermedio' | 'Avanzado';
-  duration: string;
-  category: 'Web' | 'Android' | 'iOS' | 'AI' | 'Firebase' | 'Backend' | 'DevOps';
-  tools: string[];
-  views?: number;
-  thumbnail: string;
-  date: string;
+  thumbnail?: string;
 }
 
-const contentItems: ContentItem[] = [
-  {
-    id: 1,
-    title: "React Hooks: Guía Completa para Principiantes",
-    description: "Aprende a usar los hooks más importantes de React con ejemplos prácticos y casos de uso reales.",
-    type: 'tutorial',
-    difficulty: 'Principiante',
-    duration: '25 min',
-    category: 'Web',
-    tools: ['React', 'JavaScript', 'Hooks'],
-    views: 15600,
-    thumbnail: "/api/placeholder/400/250",
-    date: "2024-01-10"
-  },
-  {
-    id: 2,
-    title: "Cómo Construir una API REST con Node.js y Express",
-    description: "Tutorial completo paso a paso para crear una API robusta y escalable desde cero.",
-    type: 'tutorial',
-    difficulty: 'Intermedio',
-    duration: '45 min',
-    category: 'Backend',
-    tools: ['Node.js', 'Express', 'MongoDB'],
-    views: 8900,
-    thumbnail: "/api/placeholder/400/250",
-    date: "2024-01-12"
-  },
-  {
-    id: 3,
-    title: "Desarrollo Android con Kotlin: Primeros Pasos",
-    description: "Introducción al desarrollo móvil Android usando Kotlin y Android Studio.",
-    type: 'mini-course',
-    difficulty: 'Principiante',
-    duration: '2 horas',
-    category: 'Android',
-    tools: ['Kotlin', 'Android Studio', 'XML'],
-    views: 11200,
-    thumbnail: "/api/placeholder/400/250",
-    date: "2024-01-08"
-  },
-  {
-    id: 4,
-    title: "SwiftUI: Creando Interfaces Modernas en iOS",
-    description: "Aprende a crear interfaces modernas y fluidas usando SwiftUI en iOS.",
-    type: 'video',
-    difficulty: 'Intermedio',
-    duration: '30 min',
-    category: 'iOS',
-    tools: ['Swift', 'SwiftUI', 'Xcode'],
-    views: 9800,
-    thumbnail: "/api/placeholder/400/250",
-    date: "2024-01-05"
-  },
-  {
-    id: 5,
-    title: "Integración de Firebase en Apps Móviles",
-    description: "Guía completa para integrar Firebase Authentication, Firestore y Cloud Functions.",
-    type: 'tutorial',
-    difficulty: 'Intermedio',
-    duration: '40 min',
-    category: 'Firebase',
-    tools: ['Firebase', 'React Native', 'JavaScript'],
-    views: 12500,
-    thumbnail: "/api/placeholder/400/250",
-    date: "2024-01-15"
-  },
-  {
-    id: 6,
-    title: "Introducción a Machine Learning con TensorFlow.js",
-    description: "Fundamentos de ML aplicados al desarrollo web usando TensorFlow.js.",
-    type: 'mini-course',
-    difficulty: 'Avanzado',
-    duration: '3 horas',
-    category: 'AI',
-    tools: ['TensorFlow.js', 'JavaScript', 'Node.js'],
-    views: 6500,
-    thumbnail: "/api/placeholder/400/250",
-    date: "2024-01-03"
-  },
-  {
-    id: 7,
-    title: "Desafío: Construye un Todo App con React",
-    description: "Ejercicio práctico para construir una aplicación de tareas completa con React y LocalStorage.",
-    type: 'coding-exercise',
-    difficulty: 'Principiante',
-    duration: '1 hora',
-    category: 'Web',
-    tools: ['React', 'CSS', 'LocalStorage'],
-    views: 8900,
-    thumbnail: "/api/placeholder/400/250",
-    date: "2024-01-01"
-  },
-  {
-    id: 8,
-    title: "Docker y CI/CD: Automatiza tus Deployments",
-    description: "Aprende a containerizar aplicaciones y configurar pipelines de CI/CD.",
-    type: 'tutorial',
-    difficulty: 'Avanzado',
-    duration: '50 min',
-    category: 'DevOps',
-    tools: ['Docker', 'GitHub Actions', 'AWS'],
-    views: 7200,
-    thumbnail: "/api/placeholder/400/250",
-    date: "2024-01-18"
-  }
-];
+interface Tutorial {
+  id: string;
+  videoId: string;
+  title: string;
+  description: string;
+  thumbnailUrl: string;
+  publishedAt: string;
+  duration?: string;
+}
+
+function normalize(s: string): string {
+  return s
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
 
 export default function ContentSection() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('Todos');
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
+  const [tutorials, setTutorials] = useState<Tutorial[]>([]);
+  const [search, setSearch] = useState('');
+  const [loadingPlaylists, setLoadingPlaylists] = useState(true);
+  const [loadingVideos, setLoadingVideos] = useState(false);
+  const [errorPlaylists, setErrorPlaylists] = useState<string | null>(null);
+  const [errorVideos, setErrorVideos] = useState<string | null>(null);
+  const [selectedTutorial, setSelectedTutorial] = useState<Tutorial | null>(null);
+
+  const fetchPlaylists = useCallback(async () => {
+    setLoadingPlaylists(true);
+    setErrorPlaylists(null);
+    try {
+      const res = await fetch('/api/tutorials/playlists');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al cargar playlists');
+      const list = data.playlists ?? [];
+      setPlaylists(list);
+      if (list.length > 0 && !selectedPlaylistId) setSelectedPlaylistId(list[0].id);
+    } catch (e) {
+      setErrorPlaylists(e instanceof Error ? e.message : 'Error');
+    } finally {
+      setLoadingPlaylists(false);
+    }
+  }, [selectedPlaylistId]);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    const section = document.getElementById('tutorials-section');
-    if (section) {
-      observer.observe(section);
-    }
-
-    return () => observer.disconnect();
+    fetchPlaylists();
   }, []);
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'tutorial':
-        return '📚';
-      case 'video':
-        return '🎥';
-      case 'mini-course':
-        return '🎓';
-      case 'coding-exercise':
-        return '💻';
-      default:
-        return '📄';
+  useEffect(() => {
+    if (!selectedPlaylistId) {
+      setTutorials([]);
+      return;
     }
-  };
+    setLoadingVideos(true);
+    setErrorVideos(null);
+    fetch(`/api/tutorials/videos?playlistId=${encodeURIComponent(selectedPlaylistId)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) throw new Error(data.error);
+        setTutorials(data.tutorials ?? []);
+      })
+      .catch((e) => setErrorVideos(e instanceof Error ? e.message : 'Error'))
+      .finally(() => setLoadingVideos(false));
+  }, [selectedPlaylistId]);
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'tutorial':
-        return 'bg-primary/20 text-primary border-primary/30';
-      case 'video':
-        return 'bg-red-500/20 text-red-400 border-red-500/30';
-      case 'mini-course':
-        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-      case 'coding-exercise':
-        return 'bg-green-500/20 text-green-400 border-green-500/30';
-      default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+  const filteredTutorials = search.trim()
+    ? tutorials.filter((t) => normalize(t.title).includes(normalize(search)))
+    : tutorials;
+
+  const selectedPlaylist = playlists.find((p) => p.id === selectedPlaylistId);
+
+  useEffect(() => {
+    const onEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedTutorial(null);
+    };
+    if (selectedTutorial) {
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', onEscape);
     }
-  };
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Principiante':
-        return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'Intermedio':
-        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      case 'Avanzado':
-        return 'bg-red-500/20 text-red-400 border-red-500/30';
-      default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
-    }
-  };
-
-  const categories = ['Todos', ...Array.from(new Set(contentItems.map(item => item.category)))];
-
-  const filteredContent = selectedCategory === 'Todos' 
-    ? contentItems 
-    : contentItems.filter(item => item.category === selectedCategory);
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', onEscape);
+    };
+  }, [selectedTutorial]);
 
   return (
-    <section id="tutorials-section" className="py-40 md:py-48 bg-black">
-      <div className="max-w-7xl mx-auto px-8 md:px-12 lg:px-16 xl:px-20">
-        <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-primary">
-              DevLokos Tutorials
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-              Aprende con guías rápidas, mini-cursos, ejercicios de código y explicaciones técnicas. 
-              Contenido educativo diseñado para desarrolladores en LATAM.
-            </p>
+    <section id="tutorials-section" className={`${SECTION_CONTAINER} bg-black`}>
+      <SectionIntro>
+        Contenido práctico organizado por playlists. Aprende nuevas tecnologías con tutoriales enfocados en ejemplos reales y casos de uso.
+      </SectionIntro>
+      {loadingPlaylists && (
+          <div className="flex justify-center py-12">
+            <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
+        )}
 
-          {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-16">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-10 py-5 rounded-full font-medium transition-all duration-300 ${
-                  selectedCategory === category
-                    ? 'bg-primary text-white shadow-lg shadow-primary/25'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+        {errorPlaylists && !loadingPlaylists && (
+          <EmptyState
+            title="Error al cargar playlists"
+            subtitle={errorPlaylists}
+            action={
+              <Button onClick={fetchPlaylists} className="bg-primary hover:bg-primary/90 text-white">
+                Reintentar
+              </Button>
+            }
+          />
+        )}
 
-          {/* Content Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 lg:gap-12 mb-16">
-            {filteredContent.map((item, index) => (
-              <div
-                key={item.id}
-                className="group bg-gray-900/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-gray-800 hover:border-primary/50 transition-all duration-300 hover:transform hover:scale-105"
-                style={{ animationDelay: `${index * 150}ms` }}
-              >
-                {/* Thumbnail */}
-                <div className="relative h-48 bg-primary/20 flex items-center justify-center">
-                  <div className="text-6xl opacity-50">{getTypeIcon(item.type)}</div>
-                  <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-medium border ${getTypeColor(item.type)}`}>
-                    {item.type === 'coding-exercise' ? 'EJERCICIO' : item.type.toUpperCase()}
-                  </div>
-                  <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(item.difficulty)}`}>
-                    {item.difficulty}
-                  </div>
-                  <div className="absolute bottom-4 left-4 bg-black/70 px-3 py-1 rounded-lg text-sm text-white font-medium">
-                    {item.duration}
-                  </div>
-                </div>
+        {!loadingPlaylists && !errorPlaylists && playlists.length === 0 && (
+          <EmptyState
+            icon={<Video className="w-12 h-12 text-primary" />}
+            title="Tutoriales próximamente"
+            subtitle="Estamos preparando el contenido."
+          />
+        )}
 
-                {/* Content */}
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm text-primary font-medium">{item.category}</span>
-                    <span className="text-sm text-gray-400">{item.date}</span>
-                  </div>
+        {!loadingPlaylists && playlists.length > 0 && (
+          <>
+            <SearchBar
+              value={search}
+              onChange={setSearch}
+              placeholder="Buscar por título..."
+              className="mb-6"
+            />
+            <div className="flex flex-wrap gap-2 justify-center mb-8">
+              {playlists.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => setSelectedPlaylistId(p.id)}
+                  className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+                    selectedPlaylistId === p.id
+                      ? 'bg-primary text-white border border-primary'
+                      : 'bg-white/5 text-zinc-400 border border-white/10 hover:border-primary/50 hover:text-white'
+                  }`}
+                >
+                  {p.title}
+                </button>
+              ))}
+            </div>
 
-                  <h3 className="text-xl font-semibold mb-3 text-white group-hover:text-primary transition-colors line-clamp-2">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-400 mb-4 text-sm leading-relaxed line-clamp-3">
-                    {item.description}
-                  </p>
-
-                  {/* Tools */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {item.tools.slice(0, 3).map((tool, idx) => (
-                      <span key={idx} className="px-2 py-1 bg-gray-800 rounded text-xs text-gray-300">
-                        {tool}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    {item.views && (
-                      <div className="flex items-center gap-2 text-sm text-gray-400">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                        {item.views.toLocaleString()} vistas
-                      </div>
-                    )}
-                    <button className="text-primary hover:text-primary/80 font-medium text-sm transition-colors">
-                      Empezar →
-                    </button>
-                  </div>
-                </div>
+            {loadingVideos && (
+              <div className="flex justify-center py-12">
+                <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               </div>
-            ))}
-          </div>
+            )}
 
-          {/* CTA */}
-          <div className="text-center">
-            <a
-              href="#"
-              className="inline-flex items-center gap-3 px-20 py-8 bg-primary rounded-full text-white font-semibold text-lg hover:bg-primary/90 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-primary/25"
+            {errorVideos && !loadingVideos && (
+              <EmptyState
+                title="Error al cargar vídeos"
+                subtitle={errorVideos}
+                action={
+                  <Button
+                    onClick={() => {
+                      setLoadingVideos(true);
+                      setErrorVideos(null);
+                      fetch(`/api/tutorials/videos?playlistId=${encodeURIComponent(selectedPlaylistId!)}`)
+                        .then((r) => r.json())
+                        .then((d) => (d.error ? Promise.reject(new Error(d.error)) : setTutorials(d.tutorials ?? [])))
+                        .catch((e) => setErrorVideos(e.message))
+                        .finally(() => setLoadingVideos(false));
+                    }}
+                    className="bg-primary hover:bg-primary/90 text-white"
+                  >
+                    Reintentar
+                  </Button>
+                }
+              />
+            )}
+
+            {!loadingVideos && !errorVideos && tutorials.length === 0 && (
+              <EmptyState
+                title="Esta playlist no tiene videos"
+                subtitle={selectedPlaylist?.title}
+              />
+            )}
+
+            {!loadingVideos && !errorVideos && tutorials.length > 0 && filteredTutorials.length === 0 && (
+              <EmptyState title="No se encontraron tutoriales" subtitle={`Búsqueda: "${search}"`} />
+            )}
+
+            {!loadingVideos && !errorVideos && filteredTutorials.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredTutorials.map((t, i) => (
+                  <motion.div
+                    key={t.id}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <TutorialCard
+                      videoId={t.videoId}
+                      title={t.title}
+                      thumbnailUrl={t.thumbnailUrl}
+                      publishedAt={t.publishedAt}
+                      playlistTitle={selectedPlaylist?.title}
+                      onClick={() => setSelectedTutorial(t)}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {selectedTutorial && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+            onClick={() => setSelectedTutorial(null)}
+          >
+            <div
+              className="relative w-full max-w-4xl bg-[#0D0D0D] rounded-2xl overflow-hidden border border-white/10"
+              onClick={(e) => e.stopPropagation()}
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              <span>Ver Todos los Tutoriales</span>
-            </a>
+              <button
+                onClick={() => setSelectedTutorial(null)}
+                className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center"
+                aria-label="Cerrar"
+              >
+                <span className="text-xl leading-none">×</span>
+              </button>
+              <div className="p-4 border-b border-white/10">
+                <h3 className="text-white font-semibold pr-12 line-clamp-2">{selectedTutorial.title}</h3>
+                {selectedPlaylist?.title && (
+                  <p className="text-zinc-500 text-sm mt-1">{selectedPlaylist.title}</p>
+                )}
+              </div>
+              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`https://www.youtube.com/embed/${selectedTutorial.videoId}?autoplay=1&rel=0`}
+                  title={selectedTutorial.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        )}
     </section>
   );
 }
-

@@ -2,21 +2,23 @@ import type { Metadata } from "next";
 import type React from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://devlokos.com'),
-  title: "DevLokos - Comunidad de Desarrolladores Latinoamérica",
-  description: "DevLokos es una comunidad para desarrolladores y creadores tech que quieren aprender, conectar y construir desde Latinoamérica. Podcast, academia, contenido gratuito y más.",
-  keywords: "DevLokos, comunidad de desarrolladores, tecnología, Latinoamérica, podcast, academia, contenido tech, programación, desarrollo web, JavaScript, React, Node.js, TypeScript",
+  title: "DevLokos - App de contenido tech en español",
+  description: "DevLokos es una app móvil que centraliza podcast, tutoriales en video, cursos, servicios empresariales y eventos. El hub digital de la marca DevLokos.",
+  keywords: "DevLokos, app tecnología, podcast tech, tutoriales desarrollo, cursos programación, eventos meetups, Latinoamérica, desarrollo web, JavaScript, React, Node.js, TypeScript",
   authors: [{ name: "DevLokos" }],
   creator: "DevLokos",
   publisher: "DevLokos",
   robots: "index, follow",
   openGraph: {
-    title: "DevLokos - Comunidad de Desarrolladores Latinoamérica",
-    description: "Construimos comunidad, conocimiento y tecnología desde Latinoamérica",
+    title: "DevLokos - App de contenido tech en español",
+    description: "App que centraliza podcast, tutoriales, cursos, servicios empresariales y eventos. Hub digital DevLokos.",
     type: "website",
     locale: "es_ES",
     siteName: "DevLokos",
@@ -26,15 +28,15 @@ export const metadata: Metadata = {
         url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: "DevLokos - Comunidad de Desarrolladores Latinoamérica",
+        alt: "DevLokos - App de contenido tech en español",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DevLokos - Comunidad de Desarrolladores Latinoamérica",
-    description: "Construimos comunidad, conocimiento y tecnología desde Latinoamérica",
+    title: "DevLokos - App de contenido tech en español",
+    description: "App que centraliza podcast, tutoriales, cursos, servicios empresariales y eventos.",
     images: ["/logo.png"],
   },
   alternates: {
@@ -63,7 +65,11 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
       </head>
       <body className={inter.className}>
-        {children}
+        <div className="min-h-screen bg-black text-white selection:bg-orange-500/30 flex flex-col">
+          <NavBar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </div>
       </body>
     </html>
   );

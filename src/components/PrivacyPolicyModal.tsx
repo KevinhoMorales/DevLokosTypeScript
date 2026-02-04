@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { Mail } from 'lucide-react';
 
 interface PrivacyPolicyModalProps {
   isOpen: boolean;
@@ -162,7 +163,10 @@ export default function PrivacyPolicyModal({ isOpen, onClose }: PrivacyPolicyMod
                 Si tienes alguna pregunta sobre esta Política de Privacidad o las prácticas de manejo de datos, por favor contáctanos en:
               </p>
               <p className="text-sm md:text-base text-primary mt-2">
-                📧 <a href="mailto:info@devlokos.com" className="hover:underline">info@devlokos.com</a>
+                <span className="inline-flex items-center gap-1.5">
+                <Mail className="w-4 h-4 shrink-0" />
+                <a href="mailto:info@devlokos.com" className="hover:underline">info@devlokos.com</a>
+              </span>
               </p>
             </section>
           </div>

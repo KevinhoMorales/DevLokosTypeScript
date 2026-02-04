@@ -1,13 +1,13 @@
-import NavBar from '@/components/NavBar';
 import HeroSection from '@/components/HeroSection';
 import PodcastSection from '@/components/PodcastSection';
-import Footer from '@/components/Footer';
+import CommunitySection from '@/components/CommunitySection';
+import { SECTION_PAGE_WRAPPER } from '@/lib/section-layout';
 
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "DevLokos",
-  "description": "Comunidad de desarrolladores y creadores tech en Latinoamérica",
+  "description": "App móvil que centraliza contenido de tecnología en español: podcast, tutoriales, cursos, servicios empresariales y eventos. Hub digital de la marca DevLokos.",
   "url": "https://devlokos.com",
   "logo": "https://devlokos.com/logo.png",
   "sameAs": [
@@ -41,12 +41,11 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <main className="min-h-screen bg-black text-white selection:bg-orange-500/30">
-        <NavBar />
-        <HeroSection />
-        <PodcastSection />
-        <Footer />
-      </main>
+      <HeroSection />
+      <PodcastSection />
+      <div className={SECTION_PAGE_WRAPPER}>
+        <CommunitySection />
+      </div>
     </>
   );
 }

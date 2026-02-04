@@ -31,7 +31,7 @@ export default function Footer() {
           {/* Left Column */}
           <div className="space-y-4">
             <Logo />
-            <p className="text-zinc-500 text-sm">© 2025 DevLokos</p>
+            <p className="text-zinc-500 text-sm">© {new Date().getFullYear()} DevLokos</p>
             <div className="flex gap-4 text-xs text-zinc-500">
               <button 
                 onClick={() => setIsTermsModalOpen(true)}

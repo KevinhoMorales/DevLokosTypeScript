@@ -1,294 +1,240 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { BookOpen, Check } from 'lucide-react';
+import { SearchBar } from '@/components/ui/SearchBar';
+import { SectionIntro } from '@/components/ui/SectionIntro';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { CourseCard, type CourseCardData } from '@/components/CourseCard';
+import { SECTION_CONTAINER } from '@/lib/section-layout';
+import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
-interface Bootcamp {
-  id: number;
-  title: string;
-  description: string;
-  level: 'Principiante' | 'Intermedio' | 'Avanzado';
-  duration: string;
-  startDate: string;
-  students: number;
-  thumbnail: string;
-  isFree: boolean;
-  topics: string[];
+const WHATSAPP_NUMBER = '593939598029';
+
+function normalize(s: string): string {
+  return s
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
 }
 
-const bootcamps: Bootcamp[] = [
-  {
-    id: 1,
-    title: "Bootcamp Full Stack JavaScript",
-    description: "Programa intensivo de 8 semanas para dominar el desarrollo full stack con JavaScript, React y Node.js.",
-    level: 'Intermedio',
-    duration: '8 semanas',
-    startDate: '2024-03-01',
-    students: 1250,
-    thumbnail: "/api/placeholder/400/250",
-    isFree: true,
-    topics: ['React', 'Node.js', 'MongoDB', 'Express']
-  },
-  {
-    id: 2,
-    title: "Bootcamp Mobile Development",
-    description: "Aprende desarrollo móvil nativo e híbrido con React Native, Flutter y tecnologías modernas.",
-    level: 'Intermedio',
-    duration: '6 semanas',
-    startDate: '2024-03-15',
-    students: 890,
-    thumbnail: "/api/placeholder/400/250",
-    isFree: true,
-    topics: ['React Native', 'Flutter', 'Firebase', 'APIs']
-  },
-  {
-    id: 3,
-    title: "Bootcamp DevOps & Cloud",
-    description: "Domina DevOps, CI/CD, Docker, Kubernetes y despliegues en la nube (AWS, GCP).",
-    level: 'Avanzado',
-    duration: '6 semanas',
-    startDate: '2024-04-01',
-    students: 650,
-    thumbnail: "/api/placeholder/400/250",
-    isFree: true,
-    topics: ['Docker', 'Kubernetes', 'AWS', 'CI/CD']
-  },
-  {
-    id: 4,
-    title: "Bootcamp Frontend Avanzado",
-    description: "Técnicas avanzadas de React, TypeScript, testing y arquitectura de aplicaciones frontend.",
-    level: 'Avanzado',
-    duration: '5 semanas',
-    startDate: '2024-04-10',
-    students: 420,
-    thumbnail: "/api/placeholder/400/250",
-    isFree: true,
-    topics: ['React', 'TypeScript', 'Testing', 'Architecture']
-  },
-  {
-    id: 5,
-    title: "Bootcamp Backend con Python",
-    description: "Construye APIs robustas con Python, Django, FastAPI y bases de datos avanzadas.",
-    level: 'Intermedio',
-    duration: '7 semanas',
-    startDate: '2024-05-01',
-    students: 320,
-    thumbnail: "/api/placeholder/400/250",
-    isFree: true,
-    topics: ['Python', 'Django', 'FastAPI', 'PostgreSQL']
-  },
-  {
-    id: 6,
-    title: "Bootcamp AI & Machine Learning",
-    description: "Introducción práctica a Machine Learning, TensorFlow y aplicaciones de IA en desarrollo.",
-    level: 'Avanzado',
-    duration: '8 semanas',
-    startDate: '2024-05-15',
-    students: 180,
-    thumbnail: "/api/placeholder/400/250",
-    isFree: true,
-    topics: ['TensorFlow', 'Python', 'ML', 'Neural Networks']
-  }
-];
-
-const testimonials = [
-  {
-    id: 1,
-    name: "Diego Martínez",
-    role: "Desarrollador Full Stack",
-    content: "El bootcamp de DevLokos Academy cambió mi carrera. En 8 semanas pasé de junior a poder construir aplicaciones completas. La comunidad y el apoyo son increíbles.",
-    avatar: "👨‍💻",
-    bootcamp: "Full Stack JavaScript"
-  },
-  {
-    id: 2,
-    name: "Sofía Ramírez",
-    role: "Mobile Developer",
-    content: "Gracias al bootcamp de Mobile Development conseguí mi primer trabajo como desarrolladora móvil. El contenido es práctico y actualizado.",
-    avatar: "👩‍💻",
-    bootcamp: "Mobile Development"
-  },
-  {
-    id: 3,
-    name: "Andrés López",
-    role: "DevOps Engineer",
-    content: "El bootcamp de DevOps me dio las herramientas para escalar mi carrera. Ahora trabajo en una startup tech y manejo toda la infraestructura.",
-    avatar: "👨‍💼",
-    bootcamp: "DevOps & Cloud"
-  }
-];
-
 export default function AcademySection() {
-  const [isVisible, setIsVisible] = useState(false);
+  const [courses, setCourses] = useState<CourseCardData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [filterPath, setFilterPath] = useState<string>('');
+  const [filterDifficulty, setFilterDifficulty] = useState<string>('');
+  const [selectedCourse, setSelectedCourse] = useState<CourseCardData | null>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    const section = document.getElementById('academy-section');
-    if (section) {
-      observer.observe(section);
-    }
-
-    return () => observer.disconnect();
+    setLoading(true);
+    setError(null);
+    fetch('/api/courses')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) throw new Error(data.error);
+        setCourses(data.courses ?? []);
+      })
+      .catch((e) => setError(e instanceof Error ? e.message : 'Error'))
+      .finally(() => setLoading(false));
   }, []);
 
-  const getLevelColor = (level: string) => {
-    switch (level) {
-      case 'Principiante':
-        return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'Intermedio':
-        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      case 'Avanzado':
-        return 'bg-red-500/20 text-red-400 border-red-500/30';
-      default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+  const learningPaths = useMemo(() => {
+    const set = new Set<string>();
+    courses.forEach((c) => (c.learningPaths ?? []).forEach((p) => set.add(p)));
+    return Array.from(set).sort();
+  }, [courses]);
+
+  const difficulties = useMemo(() => {
+    const set = new Set<string>();
+    courses.forEach((c) => {
+      if (c.difficulty) set.add(c.difficulty);
+    });
+    return Array.from(set);
+  }, [courses]);
+
+  const filtered = useMemo(() => {
+    return courses.filter((c) => {
+      if (search.trim()) {
+        const q = normalize(search);
+        const matchTitle = normalize(c.title).includes(q);
+        const matchDesc = (c.description && normalize(c.description).includes(q)) || false;
+        if (!matchTitle && !matchDesc) return false;
+      }
+      if (filterPath && !(c.learningPaths ?? []).includes(filterPath)) return false;
+      if (filterDifficulty && (c.difficulty || '').toLowerCase() !== filterDifficulty.toLowerCase()) return false;
+      return true;
+    });
+  }, [courses, search, filterPath, filterDifficulty]);
+
+  useEffect(() => {
+    const onEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedCourse(null);
+    };
+    if (selectedCourse) {
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', onEscape);
     }
-  };
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', onEscape);
+    };
+  }, [selectedCourse]);
+
+  const whatsappMessage = selectedCourse
+    ? `Hola, me interesa inscribirme al curso: ${encodeURIComponent(selectedCourse.title)}`
+    : '';
 
   return (
-    <section id="academy-section" className="py-40 md:py-48 bg-black">
-      <div className="max-w-7xl mx-auto px-8 md:px-12 lg:px-16 xl:px-20">
-        <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-primary">
-              DevLokos Academy
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-              Bootcamps intensivos de corto plazo y alto impacto. 
-              Programas diseñados para desarrolladores que buscan acelerar su carrera tech en LATAM.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-400">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span>100% Gratuito</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span>Comunidad Latina</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span>Contenido Actualizado</span>
-              </div>
-            </div>
-          </div>
+    <section id="academy-section" className={`${SECTION_CONTAINER} bg-black`}>
+      <SectionIntro>
+        Cursos estructurados por rutas de aprendizaje. Formación guiada para desarrolladores que buscan crecer paso a paso.
+      </SectionIntro>
+      <SearchBar value={search} onChange={setSearch} placeholder="Buscar cursos..." className="mb-6" />
 
-          {/* Bootcamps Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 lg:gap-12 mb-20">
-            {bootcamps.map((bootcamp, index) => (
-              <div
-                key={bootcamp.id}
-                className="group bg-gray-900/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-gray-800 hover:border-primary/50 transition-all duration-300 hover:transform hover:scale-105"
-                style={{ animationDelay: `${index * 150}ms` }}
+        {loading && (
+          <div className="flex justify-center py-12">
+            <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+
+        {error && !loading && (
+          <EmptyState
+            title="Error al cargar cursos"
+            subtitle={error}
+            action={
+              <Button
+                onClick={() => {
+                  setLoading(true);
+                  setError(null);
+                  fetch('/api/courses')
+                    .then((r) => r.json())
+                    .then((d) => (d.error ? Promise.reject(new Error(d.error)) : setCourses(d.courses ?? [])))
+                    .catch((e) => setError(e.message))
+                    .finally(() => setLoading(false));
+                }}
+                className="bg-primary hover:bg-primary/90 text-white"
               >
-                {/* Thumbnail */}
-                <div className="relative h-48 bg-primary/20 flex items-center justify-center">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                  </div>
-                  {bootcamp.isFree && (
-                    <div className="absolute top-4 left-4 bg-green-600 px-3 py-1 rounded-full text-sm font-semibold text-white">
-                      GRATIS
-                    </div>
-                  )}
-                  <div className="absolute bottom-4 left-4 bg-black/70 px-3 py-1 rounded-lg text-sm text-white font-medium">
-                    Inicia: {new Date(bootcamp.startDate).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })}
-                  </div>
-                </div>
+                Reintentar
+              </Button>
+            }
+          />
+        )}
 
-                {/* Content */}
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getLevelColor(bootcamp.level)}`}>
-                      {bootcamp.level}
-                    </span>
-                    <span className="text-sm text-gray-400">{bootcamp.duration}</span>
-                  </div>
+        {!loading && !error && courses.length === 0 && (
+          <EmptyState
+            icon={<BookOpen className="w-12 h-12 text-primary" />}
+            title="Academia próximamente"
+            subtitle="Estamos preparando los cursos."
+          />
+        )}
 
-                  <h3 className="text-xl font-semibold mb-3 text-white group-hover:text-primary transition-colors">
-                    {bootcamp.title}
-                  </h3>
-                  <p className="text-gray-400 mb-4 text-sm leading-relaxed">
-                    {bootcamp.description}
-                  </p>
-
-                  {/* Topics */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {bootcamp.topics.slice(0, 3).map((topic, idx) => (
-                      <span key={idx} className="px-2 py-1 bg-gray-800 rounded text-xs text-gray-300">
-                        {topic}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                      {bootcamp.students.toLocaleString()} estudiantes
-                    </div>
-                    <button className="text-primary hover:text-primary/80 font-medium text-sm transition-colors">
-                      Inscribirse →
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Testimonials */}
-          <div className="mb-16">
-            <h3 className="text-3xl font-bold text-center mb-12 text-primary">
-              Historias de Éxito
-            </h3>
-            <div className="grid md:grid-cols-3 gap-8 md:gap-10">
-              {testimonials.map((testimonial, index) => (
-                <div
-                  key={testimonial.id}
-                  className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-800 hover:border-primary/50 transition-all duration-300"
-                  style={{ animationDelay: `${index * 200}ms` }}
+        {!loading && !error && courses.length > 0 && (
+          <>
+            <div className="flex flex-wrap gap-3 justify-center mb-8">
+              <select
+                value={filterPath}
+                onChange={(e) => setFilterPath(e.target.value)}
+                className="bg-[#0D0D0D] border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary/50"
+              >
+                <option value="">Ruta de aprendizaje</option>
+                {learningPaths.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={filterDifficulty}
+                onChange={(e) => setFilterDifficulty(e.target.value)}
+                className="bg-[#0D0D0D] border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary/50"
+              >
+                <option value="">Dificultad</option>
+                {difficulties.map((d) => (
+                  <option key={d} value={d}>
+                    {d === 'Beginner' ? 'Principiante' : d === 'Intermediate' ? 'Intermedio' : d === 'Advanced' ? 'Avanzado' : d}
+                  </option>
+                ))}
+              </select>
+              {(filterPath || filterDifficulty) && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setFilterPath('');
+                    setFilterDifficulty('');
+                  }}
+                  className="border-white/10 text-zinc-400 hover:text-white"
                 >
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="text-4xl">{testimonial.avatar}</div>
-                    <div>
-                      <h4 className="text-lg font-semibold text-white">{testimonial.name}</h4>
-                      <p className="text-sm text-gray-400">{testimonial.role}</p>
-                      <p className="text-xs text-primary mt-1">{testimonial.bootcamp}</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-300 leading-relaxed italic text-sm">
-                    "{testimonial.content}"
-                  </p>
+                  Limpiar
+                </Button>
+              )}
+            </div>
+
+            {filtered.length === 0 ? (
+              <EmptyState title="No se encontraron cursos" subtitle="Prueba otros filtros o búsqueda." />
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filtered.map((course, i) => (
+                  <motion.div
+                    key={course.id}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.04 }}
+                  >
+                    <CourseCard course={course} onClick={() => setSelectedCourse(course)} />
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {selectedCourse && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+            onClick={() => setSelectedCourse(null)}
+          >
+            <div
+              className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-[#0D0D0D] rounded-2xl border border-white/10 p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedCourse(null)}
+                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
+                aria-label="Cerrar"
+              >
+                ×
+              </button>
+              <h3 className="text-xl font-bold text-white pr-10 mb-4">{selectedCourse.title}</h3>
+              {selectedCourse.description && (
+                <p className="text-zinc-400 text-sm mb-4">{selectedCourse.description}</p>
+              )}
+              {(selectedCourse.learningObjectives ?? []).length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-white font-semibold text-sm mb-2">Qué aprenderás</h4>
+                  <ul className="space-y-1">
+                    {selectedCourse.learningObjectives.map((obj, i) => (
+                      <li key={i} className="flex items-start gap-2 text-zinc-400 text-sm">
+                        <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                        {obj}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              ))}
+              )}
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 w-full justify-center py-3 px-4 bg-primary hover:bg-primary/90 text-white font-medium rounded-xl transition-colors"
+              >
+                Inscribirme por WhatsApp
+              </a>
             </div>
           </div>
-
-          {/* CTA */}
-          <div className="text-center">
-            <a
-              href="#"
-              className="inline-flex items-center gap-3 px-20 py-8 bg-primary rounded-full text-white font-semibold text-lg hover:bg-primary/90 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-primary/25"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              <span>Unirse a un Bootcamp</span>
-            </a>
-          </div>
-        </div>
-      </div>
+        )}
     </section>
   );
 }
-

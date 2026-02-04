@@ -1,4 +1,4 @@
-interface YouTubeVideo {
+export interface YouTubeVideo {
   id: string;
   title: string;
   description: string;
@@ -6,6 +6,47 @@ interface YouTubeVideo {
   publishedAt: string;
   duration: string;
   videoId: string;
+}
+
+export interface YouTubePlaylist {
+  id: string;
+  title: string;
+  thumbnail?: string;
+  itemCount?: number;
+}
+
+const BLOQUES_PODCAST_TITLE = 'Bloques Podcast';
+
+/**
+ * Lista las playlists de un canal de YouTube (para Tutoriales).
+ * Excluye la playlist cuyo título sea "Bloques Podcast".
+ */
+export async function getChannelPlaylists(
+  channelId: string,
+  apiKey: string
+): Promise<YouTubePlaylist[]> {
+  const all: YouTubePlaylist[] = [];
+  let nextPageToken: string | undefined;
+  do {
+    const url = `https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=${channelId}&maxResults=50&key=${apiKey}${nextPageToken ? `&pageToken=${nextPageToken}` : ''}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`YouTube playlists: ${res.statusText}`);
+    const data = await res.json();
+    const items = data.items || [];
+    for (const item of items) {
+      const title = item.snippet?.title || '';
+      if (title && title !== BLOQUES_PODCAST_TITLE) {
+        all.push({
+          id: item.id,
+          title,
+          thumbnail: item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
+          itemCount: item.contentDetails?.itemCount,
+        });
+      }
+    }
+    nextPageToken = data.nextPageToken;
+  } while (nextPageToken);
+  return all;
 }
 
 /**

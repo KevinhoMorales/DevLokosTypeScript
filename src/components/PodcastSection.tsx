@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react'
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { SectionIntro } from "@/components/ui/SectionIntro"
 import { EpisodeCard } from "@/components/EpisodeCard"
+import { SECTION_CONTAINER } from "@/lib/section-layout"
 import { motion } from "framer-motion"
 
 interface PodcastEpisode {
@@ -139,17 +141,11 @@ export default function PodcastSection() {
   const videoId = selectedEpisode ? getYouTubeVideoId(selectedEpisode.youtubeUrl) : null
 
   return (
-    <section id="podcast-section" className="w-full max-w-7xl mx-auto px-4 pb-20 space-y-12">
+    <section id="podcast-section" className={`${SECTION_CONTAINER} space-y-12`}>
+      <SectionIntro>
+        Episodios en audio y video. Búsqueda por título o invitado, filtros por temporada, sección Descubre y reproductor en pantalla completa.
+      </SectionIntro>
       <div className="space-y-6 text-center">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-4xl md:text-5xl font-bold text-white text-center"
-        >
-          Conoce los últimos episodios
-        </motion.h2>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -227,7 +223,7 @@ export default function PodcastSection() {
                   })
                   .finally(() => setLoading(false))
               }}
-              className="bg-orange-500 hover:bg-orange-600 text-white"
+              className="bg-primary hover:bg-primary/90 text-white"
             >
               Intentar de nuevo
             </Button>

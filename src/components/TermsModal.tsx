@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { Mail } from 'lucide-react';
 
 interface TermsModalProps {
   isOpen: boolean;
@@ -160,7 +161,10 @@ export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
                 Si tienes alguna pregunta o sugerencia sobre estos Términos y Condiciones, por favor contáctanos en:
               </p>
               <p className="text-sm md:text-base text-primary mt-2">
-                📧 <a href="mailto:info@devlokos.com" className="hover:underline">info@devlokos.com</a>
+                <span className="inline-flex items-center gap-1.5">
+                <Mail className="w-4 h-4 shrink-0" />
+                <a href="mailto:info@devlokos.com" className="hover:underline">info@devlokos.com</a>
+              </span>
               </p>
             </section>
           </div>
