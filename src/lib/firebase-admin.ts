@@ -22,11 +22,14 @@ function normalizeServiceAccount(parsed: Record<string, unknown>): admin.Service
   return parsed as admin.ServiceAccount;
 }
 
+type AdminWithGetApps = { app: { getApps?: () => admin.app.App[] } };
+
 /** Obtiene la app [DEFAULT] si ya existe. No usa getApps() para compatibilidad con Turbopack. */
 function getExistingDefaultApp(): admin.app.App | null {
   try {
-    if (typeof (admin as { app?: { getApps?: () => admin.app.App[] } }).app?.getApps === 'function') {
-      const apps = admin.app.getApps();
+    const adminNamespace = admin as AdminWithGetApps;
+    if (typeof adminNamespace.app?.getApps === 'function') {
+      const apps = adminNamespace.app.getApps();
       if (apps?.length > 0) return apps[0] as admin.app.App;
     }
   } catch {
@@ -40,7 +43,7 @@ function getExistingDefaultApp(): admin.app.App | null {
 }
 
 function getAdminApp(): admin.app.App {
-  const g = typeof globalThis !== 'undefined' ? (globalThis as Record<string, admin.app.App | undefined>) : undefined;
+  const g = typeof globalThis !== 'undefined' ? (globalThis as unknown as Record<string, admin.app.App | undefined>) : undefined;
   if (g?.[GLOBAL_APP_KEY]) {
     adminApp = g[GLOBAL_APP_KEY]!;
     return g[GLOBAL_APP_KEY]!;
@@ -66,7 +69,9 @@ function getAdminApp(): admin.app.App {
       const serviceAccount = normalizeServiceAccount(parsed);
       adminApp = admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
-        projectId: serviceAccount.project_id || projectId,
+        projectId: (serviceAccount as { projectId?: string; project_id?: string }).projectId
+        || (serviceAccount as { project_id?: string }).project_id
+        || projectId,
       });
       if (g) g[GLOBAL_APP_KEY] = adminApp;
       return adminApp;
