@@ -238,7 +238,7 @@ export default function AcademySection() {
                 <div className="mb-4">
                   <h4 className="text-white font-semibold text-sm mb-2">Qué aprenderás</h4>
                   <ul className="space-y-1">
-                    {selectedCourse.learningObjectives.map((obj, i) => (
+                    {(selectedCourse.learningObjectives ?? []).map((obj, i) => (
                       <li key={i} className="flex items-start gap-2 text-zinc-400 text-sm">
                         <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                         {obj}
