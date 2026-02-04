@@ -15,34 +15,57 @@ export interface YouTubePlaylist {
   itemCount?: number;
 }
 
-const BLOQUES_PODCAST_TITLE = 'Bloques Podcast';
+/** Títulos a excluir (case insensitive): playlists de podcast */
+const PODCAST_TITLE_PATTERNS = ['bloques podcast', 'devlokos podcast'];
+
+function shouldExcludePlaylistByTitle(title: string): boolean {
+  const lower = title.toLowerCase();
+  return PODCAST_TITLE_PATTERNS.some((p) => lower.includes(p));
+}
+
+/**
+ * Obtiene el channelId del primer vídeo de una playlist (para listar playlists cuando no hay channelId en config).
+ */
+export async function getChannelIdFromPlaylist(
+  playlistId: string,
+  apiKey: string
+): Promise<string | null> {
+  const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=1&key=${apiKey}`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const data = await res.json();
+  const item = data.items?.[0];
+  return item?.snippet?.channelId ?? null;
+}
 
 /**
  * Lista las playlists de un canal de YouTube (para Tutoriales).
- * Excluye la playlist cuyo título sea "Bloques Podcast".
+ * Excluye la playlist del podcast por id y las que contengan "bloques podcast" o "devlokos podcast" en el título.
  */
 export async function getChannelPlaylists(
   channelId: string,
-  apiKey: string
+  apiKey: string,
+  options?: { excludePlaylistId?: string }
 ): Promise<YouTubePlaylist[]> {
+  const excludeId = options?.excludePlaylistId ?? '';
   const all: YouTubePlaylist[] = [];
   let nextPageToken: string | undefined;
   do {
-    const url = `https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=${channelId}&maxResults=50&key=${apiKey}${nextPageToken ? `&pageToken=${nextPageToken}` : ''}`;
+    const url = `https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&channelId=${channelId}&maxResults=50&key=${apiKey}${nextPageToken ? `&pageToken=${nextPageToken}` : ''}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`YouTube playlists: ${res.statusText}`);
     const data = await res.json();
     const items = data.items || [];
     for (const item of items) {
+      if (excludeId && item.id === excludeId) continue;
       const title = item.snippet?.title || '';
-      if (title && title !== BLOQUES_PODCAST_TITLE) {
-        all.push({
-          id: item.id,
-          title,
-          thumbnail: item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
-          itemCount: item.contentDetails?.itemCount,
-        });
-      }
+      if (!title || shouldExcludePlaylistByTitle(title)) continue;
+      all.push({
+        id: item.id,
+        title,
+        thumbnail: item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
+        itemCount: item.contentDetails?.itemCount,
+      });
     }
     nextPageToken = data.nextPageToken;
   } while (nextPageToken);

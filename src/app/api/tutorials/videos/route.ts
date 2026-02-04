@@ -19,7 +19,14 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const apiKey = process.env.YOUTUBE_API_KEY ?? await getYouTubeApiKeyFromRemoteConfig('youtube_api_key');
+    const apiKey = (await getYouTubeApiKeyFromRemoteConfig('youtube_api_key').catch(() => null))
+      || (process.env.YOUTUBE_API_KEY ?? '').trim();
+    if (!apiKey) {
+      return NextResponse.json(
+        { tutorials: [], error: 'YouTube API key no configurada. Configura youtube_api_key en Remote Config o YOUTUBE_API_KEY en .env.local' },
+        { status: 200 }
+      );
+    }
     const videos = await getYouTubePlaylistVideos(playlistId, apiKey);
     const tutorials: TutorialVideo[] = videos.map((v) => ({
       id: v.videoId,

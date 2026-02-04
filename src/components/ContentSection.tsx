@@ -50,12 +50,19 @@ export default function ContentSection() {
     try {
       const res = await fetch('/api/tutorials/playlists');
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al cargar playlists');
-      const list = data.playlists ?? [];
+      const list = Array.isArray(data.playlists) ? data.playlists : [];
+      const apiError = typeof data.error === 'string' ? data.error : null;
+      if (!res.ok) {
+        setErrorPlaylists(apiError || 'Error al cargar playlists');
+        setPlaylists([]);
+        return;
+      }
       setPlaylists(list);
       if (list.length > 0 && !selectedPlaylistId) setSelectedPlaylistId(list[0].id);
+      if (list.length === 0 && apiError) setErrorPlaylists(apiError);
     } catch (e) {
       setErrorPlaylists(e instanceof Error ? e.message : 'Error');
+      setPlaylists([]);
     } finally {
       setLoadingPlaylists(false);
     }
@@ -108,14 +115,31 @@ export default function ContentSection() {
         Contenido práctico organizado por playlists. Aprende nuevas tecnologías con tutoriales enfocados en ejemplos reales y casos de uso.
       </SectionIntro>
       {loadingPlaylists && (
-          <div className="flex justify-center py-12">
-            <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="space-y-8">
+            <div className="h-12 max-w-2xl mx-auto rounded-2xl bg-[#0A0A0A] border border-white/5 animate-pulse" />
+            <div className="flex flex-wrap gap-2 justify-center">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-10 w-32 rounded-full bg-[#0A0A0A] border border-white/5 animate-pulse" />
+              ))}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="flex flex-col rounded-2xl overflow-hidden bg-[#0A0A0A] border border-white/5 animate-pulse">
+                  <div className="w-full aspect-video bg-[#F97316]/20" />
+                  <div className="p-4 space-y-3">
+                    <div className="h-4 bg-zinc-800 rounded w-24" />
+                    <div className="h-5 bg-zinc-800 rounded w-full" />
+                    <div className="h-4 bg-zinc-800 rounded w-5/6" />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-        {errorPlaylists && !loadingPlaylists && (
+        {errorPlaylists && !loadingPlaylists && playlists.length === 0 && (
           <EmptyState
-            title="Error al cargar playlists"
+            title={errorPlaylists.includes('.env') || errorPlaylists.includes('YOUTUBE') ? 'Configuración necesaria' : 'Error al cargar playlists'}
             subtitle={errorPlaylists}
             action={
               <Button onClick={fetchPlaylists} className="bg-primary hover:bg-primary/90 text-white">
@@ -125,7 +149,7 @@ export default function ContentSection() {
           />
         )}
 
-        {!loadingPlaylists && !errorPlaylists && playlists.length === 0 && (
+        {!loadingPlaylists && playlists.length === 0 && !errorPlaylists && (
           <EmptyState
             icon={<Video className="w-12 h-12 text-primary" />}
             title="Tutoriales próximamente"
@@ -158,8 +182,17 @@ export default function ContentSection() {
             </div>
 
             {loadingVideos && (
-              <div className="flex justify-center py-12">
-                <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="flex flex-col rounded-2xl overflow-hidden bg-[#0A0A0A] border border-white/5 animate-pulse">
+                    <div className="w-full aspect-video bg-[#F97316]/20" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-4 bg-zinc-800 rounded w-24" />
+                      <div className="h-5 bg-zinc-800 rounded w-full" />
+                      <div className="h-4 bg-zinc-800 rounded w-5/6" />
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
 

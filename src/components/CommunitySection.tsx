@@ -57,8 +57,36 @@ export default function CommunitySection() {
         Eventos presenciales y virtuales para la comunidad tech. Meetups, charlas y workshops organizados por DevLokos.
       </SectionIntro>
       {loading && (
-          <div className="flex justify-center py-12">
-            <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="space-y-12">
+            <div>
+              <div className="h-7 w-28 bg-zinc-800 rounded mb-6 animate-pulse" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="flex flex-col rounded-2xl overflow-hidden bg-[#0A0A0A] border border-white/5 animate-pulse">
+                    <div className="w-full aspect-video bg-[#F97316]/20" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-5 bg-zinc-800 rounded w-full" />
+                      <div className="h-4 bg-zinc-800 rounded w-32" />
+                      <div className="h-4 bg-zinc-800 rounded w-5/6" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="h-7 w-24 bg-zinc-800 rounded mb-6 animate-pulse" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[...Array(2)].map((_, i) => (
+                  <div key={i} className="flex flex-col rounded-2xl overflow-hidden bg-[#0A0A0A] border border-white/5 animate-pulse">
+                    <div className="w-full aspect-video bg-[#F97316]/20" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-5 bg-zinc-800 rounded w-full" />
+                      <div className="h-4 bg-zinc-800 rounded w-32" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 

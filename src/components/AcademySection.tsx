@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { BookOpen, Check } from 'lucide-react';
+import { BookOpen, Check, ChevronDown } from 'lucide-react';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionIntro } from '@/components/ui/SectionIntro';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -95,8 +95,17 @@ export default function AcademySection() {
       <SearchBar value={search} onChange={setSearch} placeholder="Buscar cursos..." className="mb-6" />
 
         {loading && (
-          <div className="flex justify-center py-12">
-            <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="flex flex-col rounded-2xl overflow-hidden bg-[#0A0A0A] border border-white/5 animate-pulse">
+                <div className="w-full h-[120px] bg-[#F97316]/20" />
+                <div className="p-4 space-y-3">
+                  <div className="h-4 bg-zinc-800 rounded w-20" />
+                  <div className="h-5 bg-zinc-800 rounded w-full" />
+                  <div className="h-4 bg-zinc-800 rounded w-5/6" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -133,31 +142,45 @@ export default function AcademySection() {
 
         {!loading && !error && courses.length > 0 && (
           <>
-            <div className="flex flex-wrap gap-3 justify-center mb-8">
-              <select
-                value={filterPath}
-                onChange={(e) => setFilterPath(e.target.value)}
-                className="bg-[#0D0D0D] border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary/50"
-              >
-                <option value="">Ruta de aprendizaje</option>
-                {learningPaths.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={filterDifficulty}
-                onChange={(e) => setFilterDifficulty(e.target.value)}
-                className="bg-[#0D0D0D] border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary/50"
-              >
-                <option value="">Dificultad</option>
-                {difficulties.map((d) => (
-                  <option key={d} value={d}>
-                    {d === 'Beginner' ? 'Principiante' : d === 'Intermediate' ? 'Intermedio' : d === 'Advanced' ? 'Avanzado' : d}
-                  </option>
-                ))}
-              </select>
+            <div className="flex flex-wrap gap-2 justify-center mb-8">
+              <div className="relative inline-flex items-center">
+                <select
+                  value={filterPath}
+                  onChange={(e) => setFilterPath(e.target.value)}
+                  className={`appearance-none border rounded-full pl-5 pr-10 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none cursor-pointer ${
+                    filterPath
+                      ? 'bg-primary text-white border-primary'
+                      : 'bg-white/5 text-zinc-400 border-white/10 hover:border-primary/50 hover:text-white'
+                  }`}
+                >
+                  <option value="">Ruta de aprendizaje</option>
+                  {learningPaths.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className={`absolute right-3 w-4 h-4 pointer-events-none ${filterPath ? 'text-white' : 'text-zinc-400'}`} aria-hidden />
+              </div>
+              <div className="relative inline-flex items-center">
+                <select
+                  value={filterDifficulty}
+                  onChange={(e) => setFilterDifficulty(e.target.value)}
+                  className={`appearance-none border rounded-full pl-5 pr-10 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none cursor-pointer ${
+                    filterDifficulty
+                      ? 'bg-primary text-white border-primary'
+                      : 'bg-white/5 text-zinc-400 border-white/10 hover:border-primary/50 hover:text-white'
+                  }`}
+                >
+                  <option value="">Dificultad</option>
+                  {difficulties.map((d) => (
+                    <option key={d} value={d}>
+                      {d === 'Beginner' ? 'Principiante' : d === 'Intermediate' ? 'Intermedio' : d === 'Advanced' ? 'Avanzado' : d}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className={`absolute right-3 w-4 h-4 pointer-events-none ${filterDifficulty ? 'text-white' : 'text-zinc-400'}`} aria-hidden />
+              </div>
               {(filterPath || filterDifficulty) && (
                 <Button
                   variant="outline"
@@ -165,7 +188,7 @@ export default function AcademySection() {
                     setFilterPath('');
                     setFilterDifficulty('');
                   }}
-                  className="border-white/10 text-zinc-400 hover:text-white"
+                  className="rounded-full px-5 py-2.5 text-sm font-medium bg-white/5 text-zinc-400 border border-white/10 hover:border-primary/50 hover:text-white transition-all"
                 >
                   Limpiar
                 </Button>

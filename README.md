@@ -130,13 +130,24 @@ The application uses a multi-tier fallback strategy for API keys:
 
 Create a `.env.local` file in the root directory:
 
+Copia `.env.example` a `.env.local` y rellena los valores. Para la sección **Tutoriales** necesitas al menos:
+
+- `YOUTUBE_API_KEY` – API Key de Google Cloud (YouTube Data API v3 habilitada).
+- Uno de: `YOUTUBE_CHANNEL_ID`, `YOUTUBE_TUTORIALS_PLAYLIST_ID` o `YOUTUBE_PLAYLIST_ID` (playlist principal; si no hay playlist de tutoriales se usa esta y se muestran sus vídeos como chips).
+
+Reinicia el servidor de desarrollo (`npm run dev`) después de cambiar variables de entorno.
+
 ```env
 # Firebase Admin SDK (optional - for Remote Config)
 FIREBASE_ADMIN_SDK_KEY='{"type":"service_account",...}'
 FIREBASE_PROJECT_ID=devlokos
 
-# YouTube API Key (fallback if Remote Config fails)
+# YouTube (obligatorio para Podcast y Tutoriales)
 YOUTUBE_API_KEY=your_youtube_api_key_here
+YOUTUBE_PLAYLIST_ID=PLPXi7Vgl6Ak-Bm8Y2Xxhp1dwrzWT3AbjZ
+# Opcional: canal o playlist de tutoriales
+# YOUTUBE_CHANNEL_ID=UCxxxx
+# YOUTUBE_TUTORIALS_PLAYLIST_ID=PLxxxx
 ```
 
 ### TypeScript Configuration
