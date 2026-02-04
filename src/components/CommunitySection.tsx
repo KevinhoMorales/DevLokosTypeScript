@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Calendar } from 'lucide-react';
-import { EventCard, type EventCardData } from '@/components/EventCard';
+import Image from 'next/image';
+import { Calendar, MapPin, X } from 'lucide-react';
+import { EventCard, type EventCardData, formatEventDate } from '@/components/EventCard';
 import { SectionIntro } from '@/components/ui/SectionIntro';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ export default function CommunitySection() {
   const [past, setPast] = useState<EventCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<EventCardData | null>(null);
 
   const fetchEvents = useCallback(async () => {
     setLoading(true);
@@ -34,6 +36,20 @@ export default function CommunitySection() {
   useEffect(() => {
     fetchEvents();
   }, [fetchEvents]);
+
+  useEffect(() => {
+    const onEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedEvent(null);
+    };
+    if (selectedEvent) {
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', onEscape);
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', onEscape);
+    };
+  }, [selectedEvent]);
 
   const handleShare = (event: EventCardData) => {
     const url = typeof window !== 'undefined' ? window.location.href : '';
@@ -60,14 +76,14 @@ export default function CommunitySection() {
           <div className="space-y-12">
             <div>
               <div className="h-7 w-28 bg-zinc-800 rounded mb-6 animate-pulse" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="flex flex-col rounded-2xl overflow-hidden bg-[#0A0A0A] border border-white/5 animate-pulse">
-                    <div className="w-full aspect-video bg-[#F97316]/20" />
-                    <div className="p-4 space-y-3">
-                      <div className="h-5 bg-zinc-800 rounded w-full" />
-                      <div className="h-4 bg-zinc-800 rounded w-32" />
-                      <div className="h-4 bg-zinc-800 rounded w-5/6" />
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="flex flex-col rounded-xl overflow-hidden bg-[#0A0A0A] border border-white/5 animate-pulse">
+                    <div className="w-full h-28 bg-[#F97316]/20" />
+                    <div className="p-3 space-y-2">
+                      <div className="h-4 bg-zinc-800 rounded w-full" />
+                      <div className="h-3 bg-zinc-800 rounded w-24" />
+                      <div className="h-3 bg-zinc-800 rounded w-5/6" />
                     </div>
                   </div>
                 ))}
@@ -75,13 +91,13 @@ export default function CommunitySection() {
             </div>
             <div>
               <div className="h-7 w-24 bg-zinc-800 rounded mb-6 animate-pulse" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[...Array(2)].map((_, i) => (
-                  <div key={i} className="flex flex-col rounded-2xl overflow-hidden bg-[#0A0A0A] border border-white/5 animate-pulse">
-                    <div className="w-full aspect-video bg-[#F97316]/20" />
-                    <div className="p-4 space-y-3">
-                      <div className="h-5 bg-zinc-800 rounded w-full" />
-                      <div className="h-4 bg-zinc-800 rounded w-32" />
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="flex flex-col rounded-xl overflow-hidden bg-[#0A0A0A] border border-white/5 animate-pulse">
+                    <div className="w-full h-28 bg-[#F97316]/20" />
+                    <div className="p-3 space-y-2">
+                      <div className="h-4 bg-zinc-800 rounded w-full" />
+                      <div className="h-3 bg-zinc-800 rounded w-24" />
                     </div>
                   </div>
                 ))}
@@ -115,7 +131,7 @@ export default function CommunitySection() {
             {upcoming.length > 0 && (
               <div>
                 <h3 className="text-xl font-semibold text-white mb-6">Próximos</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {upcoming.map((event, i) => (
                     <motion.div
                       key={event.id}
@@ -123,7 +139,7 @@ export default function CommunitySection() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.05 }}
                     >
-                      <EventCard event={event} onShare={handleShare} />
+                      <EventCard event={event} onShare={handleShare} onClick={setSelectedEvent} />
                     </motion.div>
                   ))}
                 </div>
@@ -133,7 +149,7 @@ export default function CommunitySection() {
             {past.length > 0 && (
               <div>
                 <h3 className="text-xl font-semibold text-white mb-6">Pasados</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {past.map((event, i) => (
                     <motion.div
                       key={event.id}
@@ -141,13 +157,87 @@ export default function CommunitySection() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.05 }}
                     >
-                      <EventCard event={event} onShare={handleShare} />
+                      <EventCard event={event} onShare={handleShare} onClick={setSelectedEvent} />
                     </motion.div>
                   ))}
                 </div>
               </div>
             )}
           </div>
+        )}
+
+        {selectedEvent && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+            onClick={() => setSelectedEvent(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ type: 'tween', duration: 0.2 }}
+              className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-[#0D0D0D] rounded-2xl border border-white/10 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedEvent(null)}
+                className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+                aria-label="Cerrar"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {selectedEvent.imageUrl && (
+                <div className="relative w-full h-48 sm:h-56 bg-zinc-900 rounded-t-2xl overflow-hidden">
+                  <Image
+                    src={selectedEvent.imageUrl}
+                    alt={selectedEvent.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 512px) 100vw, 512px"
+                    unoptimized
+                  />
+                </div>
+              )}
+
+              <div className="p-6 sm:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-white pr-10 mb-4">{selectedEvent.title}</h2>
+
+                <div className="flex flex-col gap-2 mb-4">
+                  <div className="flex items-center gap-2 text-zinc-400 text-sm">
+                    <Calendar className="w-4 h-4 shrink-0 text-primary" />
+                    {formatEventDate(selectedEvent.eventDate)}
+                  </div>
+                  {(selectedEvent.city || selectedEvent.location) && (
+                    <div className="flex items-center gap-2 text-zinc-400 text-sm">
+                      <MapPin className="w-4 h-4 shrink-0 text-primary" />
+                      {[selectedEvent.city, selectedEvent.location].filter(Boolean).join(' · ')}
+                    </div>
+                  )}
+                </div>
+
+                {selectedEvent.description && (
+                  <div className="mb-6">
+                    <p className="text-zinc-400 text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
+                      {selectedEvent.description}
+                    </p>
+                  </div>
+                )}
+
+                {selectedEvent.registrationUrl && (
+                  <a
+                    href={selectedEvent.registrationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center w-full py-3.5 px-5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-colors"
+                  >
+                    Registrarme
+                  </a>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
         )}
     </section>
   );
