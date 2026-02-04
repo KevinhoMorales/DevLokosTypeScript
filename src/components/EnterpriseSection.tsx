@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Search, Palette, Code, Rocket, Check, Briefcase, FolderOpen } from 'lucide-react';
 import { SectionIntro } from '@/components/ui/SectionIntro';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SECTION_CONTAINER } from '@/lib/section-layout';
@@ -18,6 +17,14 @@ const PROJECT_TYPES = [
   'DevOps e infraestructura',
   'Otro',
 ];
+
+/** Email: algo@dominio.algo */
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function getEmailError(value: string): string | null {
+  if (!value.trim()) return null;
+  return EMAIL_REGEX.test(value.trim()) ? null : 'Escribe un correo válido (ej: nombre@dominio.com)';
+}
 
 const PROCESS_STEPS = [
   { icon: Search, label: 'Descubrimiento' },
@@ -58,6 +65,9 @@ export default function EnterpriseSection() {
     message: '',
   });
 
+  const emailError = getEmailError(form.email);
+  const canSubmit = !emailError;
+
   useEffect(() => {
     Promise.all([fetch('/api/services').then((r) => r.json()), fetch('/api/portfolio').then((r) => r.json())])
       .then(([svc, port]) => {
@@ -84,13 +94,35 @@ export default function EnterpriseSection() {
         message: form.message,
       }),
     })
-      .then((r) => r.json())
+      .then(async (r) => {
+        const text = await r.text();
+        let data: { error?: string; success?: boolean };
+        try {
+          data = JSON.parse(text);
+        } catch {
+          return { error: 'Error al enviar el mensaje. Intenta más tarde.' };
+        }
+        if (!r.ok && data.error) return { error: data.error };
+        if (data.error) return { error: data.error };
+        return data;
+      })
       .then((data) => {
         if (data.error) throw new Error(data.error);
         setFormSent(true);
         setForm({ name: '', email: '', phone: '', company: '', projectType: '', message: '' });
       })
-      .catch((e) => setFormError(e instanceof Error ? e.message : 'Error al enviar'))
+      .catch((e) => {
+        const msg = e instanceof Error ? e.message : 'Error al enviar';
+        if (msg === 'Formulario no configurado') {
+          const base = 'En este momento no podemos recibir mensajes por este formulario. Por favor intenta más tarde o contacta por otro medio.';
+          const devHint = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+            ? ' Para activarlo: configura web_3_form en Firebase Remote Config o WEB3FORMS_ACCESS_KEY en .env.local y reinicia el servidor.'
+            : '';
+          setFormError(base + devHint);
+        } else {
+          setFormError(msg);
+        }
+      })
       .finally(() => setFormLoading(false));
   };
 
@@ -129,55 +161,88 @@ export default function EnterpriseSection() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
-                required
-                value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                placeholder="Nombre *"
-                className="bg-[#0D0D0D] border-white/10 text-white placeholder:text-zinc-500"
-              />
-              <Input
-                required
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                placeholder="Email *"
-                className="bg-[#0D0D0D] border-white/10 text-white placeholder:text-zinc-500"
-              />
-              <Input
-                value={form.phone}
-                onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                placeholder="Teléfono"
-                className="bg-[#0D0D0D] border-white/10 text-white placeholder:text-zinc-500"
-              />
-              <Input
-                value={form.company}
-                onChange={(e) => setForm((f) => ({ ...f, company: e.target.value }))}
-                placeholder="Empresa"
-                className="bg-[#0D0D0D] border-white/10 text-white placeholder:text-zinc-500"
-              />
-              <select
-                value={form.projectType}
-                onChange={(e) => setForm((f) => ({ ...f, projectType: e.target.value }))}
-                className="w-full h-10 px-3 rounded-md border border-white/10 bg-[#0D0D0D] text-white text-sm"
-              >
-                <option value="">Tipo de proyecto</option>
-                {PROJECT_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-              <textarea
-                required
-                value={form.message}
-                onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
-                placeholder="Mensaje *"
-                rows={4}
-                className="w-full px-3 py-2 rounded-md border border-white/10 bg-[#0D0D0D] text-white placeholder:text-zinc-500 resize-none"
-              />
+              <div>
+                <Input
+                  required
+                  id="contact-name"
+                  value={form.name}
+                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  placeholder="Nombre *"
+                  className="bg-[#0D0D0D] border-white/10 text-white placeholder:text-zinc-500 h-11"
+                />
+                <p className="text-zinc-500 text-xs mt-1.5">Tu nombre o el de la persona de contacto.</p>
+              </div>
+              <div>
+                <Input
+                  required
+                  id="contact-email"
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                  placeholder="Email *"
+                  className={`bg-[#0D0D0D] text-white placeholder:text-zinc-500 h-11 ${emailError ? 'border-red-500 focus-visible:ring-red-500/50 focus-visible:border-red-500' : 'border-white/10'}`}
+                  aria-invalid={!!emailError}
+                />
+                {emailError ? (
+                  <p className="text-red-400 text-xs mt-1.5">{emailError}</p>
+                ) : (
+                  <p className="text-zinc-500 text-xs mt-1.5">Usaremos este correo para responderte.</p>
+                )}
+              </div>
+              <div>
+                <Input
+                  required
+                  id="contact-phone"
+                  type="tel"
+                  value={form.phone}
+                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                  placeholder="Teléfono *"
+                  className="bg-[#0D0D0D] border-white/10 text-white placeholder:text-zinc-500 h-11"
+                />
+                <p className="text-zinc-500 text-xs mt-1.5">Incluye código de país, ej: +593939598029</p>
+              </div>
+              <div>
+                <Input
+                  required
+                  id="contact-company"
+                  value={form.company}
+                  onChange={(e) => setForm((f) => ({ ...f, company: e.target.value }))}
+                  placeholder="Empresa *"
+                  className="bg-[#0D0D0D] border-white/10 text-white placeholder:text-zinc-500 h-11"
+                />
+                <p className="text-zinc-500 text-xs mt-1.5">Nombre de tu empresa u organización.</p>
+              </div>
+              <div>
+                <select
+                  required
+                  id="contact-project-type"
+                  value={form.projectType}
+                  onChange={(e) => setForm((f) => ({ ...f, projectType: e.target.value }))}
+                  className="w-full h-11 px-3 rounded-md border border-white/10 bg-[#0D0D0D] text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-[color,box-shadow]"
+                >
+                  <option value="">Tipo de proyecto *</option>
+                  {PROJECT_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-zinc-500 text-xs mt-1.5">Selecciona la opción que más se acerque a tu necesidad.</p>
+              </div>
+              <div>
+                <textarea
+                  required
+                  id="contact-message"
+                  value={form.message}
+                  onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+                  placeholder="Mensaje *"
+                  rows={4}
+                  className="w-full px-3 py-2 rounded-md border border-white/10 bg-[#0D0D0D] text-white placeholder:text-zinc-500 resize-none text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-[color,box-shadow]"
+                />
+                <p className="text-zinc-500 text-xs mt-1.5">Describe brevemente tu proyecto o consulta.</p>
+              </div>
               {formError && <p className="text-red-400 text-sm">{formError}</p>}
-              <Button type="submit" disabled={formLoading} className="w-full bg-primary hover:bg-primary/90 text-white">
+              <Button type="submit" disabled={formLoading || !canSubmit} className="w-full bg-primary hover:bg-primary/90 text-white disabled:opacity-50 disabled:pointer-events-none">
                 {formLoading ? 'Enviando...' : 'Enviar mensaje'}
               </Button>
             </form>
@@ -258,14 +323,6 @@ export default function EnterpriseSection() {
               ))}
             </div>
           </div>
-        )}
-
-        {!loading && services.length === 0 && portfolio.length === 0 && (
-          <EmptyState
-            icon={<Briefcase className="w-12 h-12 text-primary" />}
-            title="Contáctanos"
-            subtitle="Usa el formulario de arriba para iniciar un proyecto."
-          />
         )}
     </section>
   );

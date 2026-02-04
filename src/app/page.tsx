@@ -1,6 +1,4 @@
-import HeroSection from '@/components/HeroSection';
 import PodcastSection from '@/components/PodcastSection';
-import CommunitySection from '@/components/CommunitySection';
 import { SECTION_PAGE_WRAPPER } from '@/lib/section-layout';
 
 const structuredData = {
@@ -34,6 +32,11 @@ const structuredData = {
   ]
 };
 
+export const metadata = {
+  title: "DevLokos | Podcast",
+  description: "Episodios del podcast DevLokos. Búsqueda por título o invitado, filtros por temporada y reproductor en pantalla completa.",
+};
+
 export default function Home() {
   return (
     <>
@@ -41,10 +44,8 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <HeroSection />
-      <PodcastSection />
       <div className={SECTION_PAGE_WRAPPER}>
-        <CommunitySection />
+        <PodcastSection />
       </div>
     </>
   );

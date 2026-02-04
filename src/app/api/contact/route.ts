@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getRemoteConfigValue } from '@/lib/firebase-admin';
 
 const PROJECT_TYPES = [
   'Desarrollo de software a medida',
@@ -10,7 +11,8 @@ const PROJECT_TYPES = [
 ];
 
 export async function POST(request: NextRequest) {
-  const apiKey = process.env.WEB3FORMS_ACCESS_KEY;
+  const apiKey = (await getRemoteConfigValue('web_3_form').catch(() => null))
+    || (process.env.WEB3FORMS_ACCESS_KEY ?? '').trim();
   if (!apiKey) {
     return NextResponse.json({ error: 'Formulario no configurado' }, { status: 503 });
   }
@@ -19,25 +21,53 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, email, phone, company, projectType, message } = body as Record<string, string>;
 
-    if (!name?.trim() || !email?.trim() || !message?.trim()) {
-      return NextResponse.json({ error: 'Nombre, email y mensaje son obligatorios' }, { status: 400 });
+    if (!name?.trim() || !email?.trim() || !phone?.trim() || !company?.trim() || !message?.trim()) {
+      return NextResponse.json({ error: 'Todos los campos son obligatorios' }, { status: 400 });
     }
+    if (!projectType?.trim() || !PROJECT_TYPES.includes(projectType)) {
+      return NextResponse.json({ error: 'Selecciona un tipo de proyecto' }, { status: 400 });
+    }
+
+    const n = name.trim();
+    const e = email.trim();
+    const p = phone.trim();
+    const c = company.trim();
+    const formattedMessage = [
+      `Nombre: ${n}`,
+      `Email: ${e}`,
+      `Teléfono: ${p}`,
+      `Empresa: ${c}`,
+      `Tipo de proyecto: ${projectType}`,
+      '',
+      message.trim(),
+    ].join('\n');
 
     const res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         access_key: apiKey,
-        name: name.trim(),
-        email: email.trim(),
-        phone: phone?.trim() || '',
-        company: company?.trim() || '',
-        project_type: projectType && PROJECT_TYPES.includes(projectType) ? projectType : 'Otro',
-        message: message.trim(),
+        subject: `Nuevo proyecto: ${n}`,
+        name: n,
+        email: e,
+        phone: p,
+        company: c,
+        project_type: projectType,
+        message: formattedMessage,
       }),
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    let data: { success?: boolean; message?: string };
+    try {
+      data = JSON.parse(text);
+    } catch {
+      console.error('contact: Web3Forms devolvió no-JSON', res.status, text.slice(0, 200));
+      const msg = res.status === 403
+        ? 'El servicio de envío no está disponible temporalmente (acceso bloqueado). Intenta más tarde.'
+        : 'Error al enviar el mensaje. Intenta más tarde.';
+      return NextResponse.json({ error: msg }, { status: 500 });
+    }
     if (!res.ok) {
       return NextResponse.json({ error: data.message || 'Error al enviar' }, { status: 500 });
     }
