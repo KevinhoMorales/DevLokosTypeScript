@@ -88,10 +88,8 @@ export default function PodcastSection() {
     fetchEpisodes()
   }, [])
 
-  // Filtrar por temporada (S1/S2 desde API) y luego por búsqueda
-  const seasonNum = selectedSeason === 'Temporada 2' ? 2 : 1
-  const episodesBySeason = episodes.filter(ep => (ep.season ?? 2) === seasonNum)
-  const filteredEpisodes = episodesBySeason.filter(episode => {
+  // Búsqueda siempre sobre TODOS los episodios (independiente del filtro de temporada)
+  const searchFiltered = episodes.filter(episode => {
     const searchNormalized = normalizeText(searchQuery)
     const titleNormalized = normalizeText(episode.title)
     const guestNormalized = episode.guest ? normalizeText(episode.guest) : ''
@@ -99,6 +97,10 @@ export default function PodcastSection() {
     const guestMatch = guestNormalized.includes(searchNormalized)
     return titleMatch || guestMatch
   })
+  const seasonNum = selectedSeason === 'Temporada 2' ? 2 : 1
+  const bySeason = episodes.filter(ep => (ep.season ?? 2) === seasonNum)
+  // Si hay búsqueda: mostrar todos los resultados (ambas temporadas). Si no: aplicar solo el filtro de temporada.
+  const filteredEpisodes = searchQuery.trim() ? searchFiltered : bySeason
 
   const podcastViewedRef = useRef(false)
   useEffect(() => {
