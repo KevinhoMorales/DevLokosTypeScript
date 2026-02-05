@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from 'react';
 import Image from 'next/image';
-import { BookOpen, Check, ChevronDown, X, Clock, Layers, MessageCircle } from 'lucide-react';
+import { BookOpen, Check, ChevronDown, X, Clock, Layers, MessageCircle, SearchX } from 'lucide-react';
 import { analyticsEvents } from '@/lib/analytics';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionIntro } from '@/components/ui/SectionIntro';
@@ -243,7 +243,7 @@ export default function AcademySection() {
             </div>
 
             {filtered.length === 0 ? (
-              <EmptyState title="No se encontraron cursos" subtitle="Prueba otros filtros o búsqueda." />
+              <EmptyState icon={<SearchX className="h-14 w-14" />} title="No se encontraron cursos" subtitle="Prueba otros filtros o búsqueda." />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filtered.map((course, i) => (

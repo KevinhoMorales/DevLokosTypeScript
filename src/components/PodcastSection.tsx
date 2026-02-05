@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from 'react'
-import { Search } from "lucide-react"
+import { Search, X, SearchX } from "lucide-react"
 import { analyticsEvents } from '@/lib/analytics'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -202,7 +202,18 @@ export default function PodcastSection() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="relative w-full bg-[#0A0A0A] border-white/10 text-white placeholder:text-zinc-600 h-14 pl-6 pr-14 rounded-2xl focus-visible:ring-orange-500 focus-visible:border-orange-500/50 transition-all shadow-2xl"
           />
-          <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500 h-6 w-6" />
+          {searchQuery ? (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 z-10"
+              aria-label="Borrar búsqueda"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          ) : (
+            <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500 h-6 w-6 pointer-events-none" />
+          )}
         </motion.div>
       </div>
 
@@ -371,7 +382,8 @@ export default function PodcastSection() {
               )}
             </>
           ) : (
-            <div className="text-center py-16">
+            <div className="flex flex-col items-center justify-center text-center py-16 px-4">
+              <SearchX className="h-14 w-14 text-zinc-500 mb-4" />
               <p className="text-white/60 text-lg md:text-xl">
                 No se encontraron episodios con "{searchQuery}"
               </p>

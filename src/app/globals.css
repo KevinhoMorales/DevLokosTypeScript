@@ -123,6 +123,20 @@
   }
 }
 
+/* Ocultar el botón nativo de borrar en inputs type="search" (la X azul del navegador) */
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+input[type="search"]::-moz-search-cancel-button {
+  display: none;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;

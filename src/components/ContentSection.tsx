@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { Video } from 'lucide-react';
+import { Video, SearchX } from 'lucide-react';
 import { analyticsEvents } from '@/lib/analytics';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionIntro } from '@/components/ui/SectionIntro';
@@ -257,7 +257,7 @@ export default function ContentSection() {
             )}
 
             {!loadingVideos && !errorVideos && tutorials.length > 0 && filteredTutorials.length === 0 && (
-              <EmptyState title="No se encontraron tutoriales" subtitle={`Búsqueda: "${search}"`} />
+              <EmptyState icon={<SearchX className="h-14 w-14" />} title="No se encontraron tutoriales" subtitle={`Búsqueda: "${search}"`} />
             )}
 
             {!loadingVideos && !errorVideos && filteredTutorials.length > 0 && (
