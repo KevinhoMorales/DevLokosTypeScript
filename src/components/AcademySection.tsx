@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from 'react';
 import Image from 'next/image';
-import { BookOpen, Check, ChevronDown, X, Clock, Layers, MessageCircle, SearchX } from 'lucide-react';
+import { BookOpen, Check, ChevronDown, X, Clock, Layers, MessageCircle, SearchX, User } from 'lucide-react';
 import { analyticsEvents } from '@/lib/analytics';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionIntro } from '@/components/ui/SectionIntro';
@@ -331,6 +331,13 @@ export default function AcademySection() {
                 </div>
 
                 <h2 className="text-xl sm:text-2xl font-bold text-white pr-10 mb-4">{selectedCourse.title}</h2>
+
+                {selectedCourse.professor && (
+                  <p className="flex items-center gap-2 text-zinc-400 text-sm mb-4">
+                    <User className="w-4 h-4 text-primary shrink-0" />
+                    <span>Instructor: <span className="text-white font-medium">{selectedCourse.professor}</span></span>
+                  </p>
+                )}
 
                 {selectedCourse.learningPaths && selectedCourse.learningPaths.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">

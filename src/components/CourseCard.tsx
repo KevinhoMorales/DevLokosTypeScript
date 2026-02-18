@@ -14,6 +14,8 @@ export interface CourseCardData {
   learningPaths?: string[];
   modules?: { title?: string }[];
   learningObjectives?: string[];
+  /** Nombre del instructor (viene como `professor` del API). */
+  professor?: string;
 }
 
 function difficultyClass(d: string | undefined): string {
