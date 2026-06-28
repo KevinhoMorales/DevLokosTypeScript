@@ -1,369 +1,290 @@
-# 📐 Estructura UI del Proyecto DevLokos
+# Estructura UI — DevLokos Hub Web
 
-## 🏗️ Arquitectura General
+Documentación de la arquitectura visual y de componentes del hub web DevLokos (Next.js 16 App Router).
 
-El proyecto está estructurado siguiendo el patrón de **Next.js App Router** con componentes modulares React. La estructura visual de la página sigue este orden jerárquico:
+**Última actualización:** Junio 2026
 
-```
-┌─────────────────────────────────────────┐
-│           ROOT LAYOUT                    │
-│    (layout.tsx - Configuración global)   │
-└─────────────────────────────────────────┘
-                    │
-                    ▼
-┌─────────────────────────────────────────┐
-│         PAGE (page.tsx)                 │
-│    Punto de entrada principal           │
-└─────────────────────────────────────────┘
-                    │
-        ┌───────────┼───────────┐
-        │           │           │
-        ▼           ▼           ▼
-┌──────────┐ ┌──────────┐ ┌──────────┐
-│  HEADER  │ │   BODY   │ │  FOOTER  │
-│ (NavBar) │ │  (Main)  │ │ (Footer) │
-└──────────┘ └──────────┘ └──────────┘
-                    │
-        ┌───────────┼───────────┐
-        │                       │
-        ▼                       ▼
-┌──────────────┐      ┌──────────────┐
-│   HERO       │      │   PODCAST    │
-│   SECTION    │      │   SECTION    │
-└──────────────┘      └──────────────┘
+---
+
+## Arquitectura general
+
+El sitio es un **hub multi-página** con layout global compartido. Cada ruta renderiza una sección de contenido independiente.
+
+```mermaid
+flowchart TB
+  subgraph layout [Root Layout]
+    NavBar[NavBar sticky]
+    Children["{children}"]
+    Footer[Footer]
+    Analytics[AnalyticsProvider]
+  end
+
+  subgraph pages [Páginas]
+    Home["/ → PodcastSection"]
+    Podcast["/podcast → PodcastSection"]
+    Tutoriales["/tutoriales → ContentSection"]
+    Academia["/academia → AcademySection"]
+    Empresarial["/empresarial → EnterpriseSection"]
+    Eventos["/eventos → CommunitySection"]
+  end
+
+  NavBar --> Children
+  Children --> Home
+  Children --> Podcast
+  Children --> Tutoriales
+  Children --> Academia
+  Children --> Empresarial
+  Children --> Eventos
+  Children --> Footer
+  Analytics --> layout
 ```
 
 ---
 
-## 📁 Estructura de Archivos
+## Layout global
 
-### 1. **Layout Principal** (`src/app/layout.tsx`)
-**Propósito**: Configuración global de la aplicación
+**Archivo:** [`src/app/layout.tsx`](src/app/layout.tsx)
 
-**Responsabilidades**:
-- Define metadatos SEO (título, descripción, Open Graph, Twitter Cards)
-- Configura fuentes globales (Eudoxus Sans)
-- Establece el tema oscuro (`className="dark"`)
-- Aplica estilos globales al `<body>`
-- Incluye Material Symbols para iconos
+Responsabilidades:
 
-**Código clave**:
+- Metadata SEO (Open Graph, Twitter Cards, canonical)
+- Fuente **Inter** vía `next/font/google`
+- Tema oscuro (`className="dark"` en `<html>`)
+- Estructura persistente:
+
 ```tsx
 <html lang="es" className="dark">
-  <body className="bg-background-dark text-white">
-    {children}
+  <body>
+    <AnalyticsProvider>
+      <NavBar />
+      <main>{children}</main>
+      <Footer />
+    </AnalyticsProvider>
   </body>
 </html>
 ```
 
+NavBar y Footer **no** se repiten en cada página; viven en el layout raíz.
+
 ---
 
-### 2. **Página Principal** (`src/app/page.tsx`)
-**Propósito**: Orquesta todos los componentes de la UI
+## Páginas y secciones
 
-**Estructura**:
+Cada página importa su sección dentro de `SECTION_PAGE_WRAPPER` ([`src/lib/section-layout.ts`](src/lib/section-layout.ts)):
+
 ```tsx
-<div> {/* Contenedor principal */}
-  <NavBar />        {/* HEADER - Navegación fija */}
-  <main>            {/* BODY - Contenido principal */}
-    <HeroSection />     {/* Sección Hero */}
-    <PodcastSection />  {/* Sección de Podcast */}
-  </main>
-  <Footer />        {/* FOOTER - Pie de página */}
+// Ejemplo: src/app/academia/page.tsx
+<div className={SECTION_PAGE_WRAPPER}>
+  <AcademySection />
 </div>
 ```
 
-**Características**:
-- Contenedor con `min-h-screen` para altura mínima
-- Centrado horizontal con `items-center`
-- Incluye datos estructurados (JSON-LD) para SEO
-- Sin `gap` entre secciones para control manual de espaciado
+| Ruta | Archivo | Sección | Descripción |
+|------|---------|---------|-------------|
+| `/` | `src/app/page.tsx` | `PodcastSection` | Episodios + JSON-LD |
+| `/podcast` | `src/app/podcast/page.tsx` | `PodcastSection` | Igual que home |
+| `/tutoriales` | `src/app/tutoriales/page.tsx` | `ContentSection` | Playlists + videos |
+| `/academia` | `src/app/academia/page.tsx` | `AcademySection` | Cursos Firestore |
+| `/empresarial` | `src/app/empresarial/page.tsx` | `EnterpriseSection` | Servicios + contacto |
+| `/eventos` | `src/app/eventos/page.tsx` | `CommunitySection` | Eventos próximos/pasados |
+
+### Clases de layout compartidas
+
+| Constante | Valor | Uso |
+|-----------|-------|-----|
+| `SECTION_PAGE_WRAPPER` | `py-8 md:py-12` | Padding vertical de cada página |
+| `SECTION_CONTAINER` | `max-w-7xl mx-auto px-4...` | Contenedor interno de secciones |
 
 ---
 
-## 🎨 Componentes de UI
+## Navegación
 
-### 1. **HEADER - NavBar** (`src/components/NavBar.tsx`)
+**Archivo:** [`src/components/NavBar.tsx`](src/components/NavBar.tsx)
 
-**Ubicación**: Fijo en la parte superior (`fixed top-0`)
-
-**Características**:
-- **Posición**: `fixed top-0 left-0 right-0 z-50`
-- **Fondo**: Negro semitransparente con blur (`bg-black/80 backdrop-blur-sm`)
-- **Contenido**:
-  - Logo DevLokos (`logo-transparent.png`)
-  - Botón "Suscribirse" (naranja, link a YouTube)
-- **Responsive**: Menú hamburguesa en móvil
-
-**Estructura**:
-```
-NavBar
-├── Logo (izquierda)
-└── Botón Suscribirse (derecha)
-    └── Menú móvil (si está abierto)
-```
-
-**Padding**: `py-3` (reducido para ahorrar espacio vertical)
+- Sticky header con blur (`bg-black/80 backdrop-blur-md`)
+- 5 enlaces: Podcast, Tutoriales, Academia, Empresarial, Eventos
+- Logo enlaza a `/`
+- Botón "Suscribirse" → YouTube
+- Menú hamburguesa en mobile (Lucide `Menu` / `X`)
+- Estado activo con `usePathname()`
 
 ---
 
-### 2. **BODY - Contenido Principal**
+## Componentes por módulo
 
-El body está dividido en dos secciones principales dentro de `<main>`:
+### Podcast — `PodcastSection.tsx`
 
-#### 2.1 **Hero Section** (`src/components/HeroSection.tsx`)
+- Fetch a `/api/episodes`
+- `SearchBar` + filtro por temporada (S1/S2)
+- Grid de `EpisodeCard`
+- Modal de video YouTube a pantalla completa
+- Paginación client-side
 
-**Propósito**: Primera impresión, presentación de la marca
+### Tutoriales — `ContentSection.tsx`
 
-**Características**:
-- **Fondo**: Negro sólido (`bg-black`)
-- **Contenido**:
-  - Logo grande con padding superior (`pt-20`)
-  - Título principal: "Bienvenido a DevLokos"
-  - Dos párrafos descriptivos
-- **Espaciado**: 
-  - Padding vertical: `py-40 md:py-48 lg:py-56`
-  - Margen superior: `mt-24` (para compensar NavBar fijo)
-  - Margen inferior: `mb-20 md:mb-28 lg:mb-36`
+- Fetch a `/api/tutorials/playlists` y `/api/tutorials/videos`
+- Chips de playlists (excluye playlist del podcast)
+- Búsqueda en memoria
+- `TutorialCard` + modal de video
 
-**Estructura**:
-```
-HeroSection
-├── Contenedor con fondo negro
-│   ├── Logo (con pt-20)
-│   └── Contenido
-│       ├── H1: "Bienvenido a DevLokos"
-│       └── H2: Descripción (2 párrafos)
-```
+### Academia — `AcademySection.tsx`
 
----
+- Fetch a `/api/courses`
+- Filtros por dificultad y ruta de aprendizaje
+- `CourseCard` con detalle expandible
+- CTA inscripción vía WhatsApp
 
-#### 2.2 **Podcast Section** (`src/components/PodcastSection.tsx`)
+### Empresarial — `EnterpriseSection.tsx`
 
-**Propósito**: Mostrar los episodios del podcast con búsqueda y paginación
+- Fetch a `/api/services` y `/api/portfolio`
+- Formulario de contacto (Web3Forms desde cliente)
+- Obtiene access key vía `/api/contact/config`
 
-**Características**:
-- **Fondo**: Negro sólido (`bg-black`)
-- **Funcionalidades**:
-  - Búsqueda por título o invitado (sin tildes)
-  - Paginación (6 episodios por página)
-  - Modal de YouTube al hacer clic
-  - Skeleton loader mientras carga
-- **Contenido**:
-  - Título: "Conoce los últimos episodios"
-  - Barra de búsqueda con efecto glow
-  - Grid de episodios (responsive: 1/2/3 columnas)
-  - Controles de paginación
+### Eventos — `CommunitySection.tsx`
 
-**Espaciado**:
-- Padding vertical: `py-40 md:py-48 lg:py-56`
-- Margen entre título y búsqueda: `mb-14 md:mb-18`
-- Margen entre búsqueda y grid: `mb-14 md:mb-18`
-- Margen inferior del grid: `mb-24 md:mb-32 lg:mb-40`
-
-**Estructura**:
-```
-PodcastSection
-├── Header
-│   ├── H1: "Conoce los últimos episodios"
-│   └── Barra de búsqueda
-├── Grid de Episodios (6 por página)
-│   └── Card de Episodio
-│       ├── Thumbnail (con play button overlay)
-│       └── Contenido
-│           ├── Nombre del invitado
-│           ├── Título del episodio
-│           └── Descripción
-└── Paginación (si hay más de 6 episodios)
-```
-
-**Card de Episodio**:
-- Padding interno: `p-12 md:p-16 lg:p-20`
-- Márgenes entre elementos: `mb-6 md:mb-8` (título/invitado), `mb-10 md:mb-12` (descripción)
+- Fetch a `/api/events`
+- Separa upcoming / past
+- `EventCard` + modal de detalle
 
 ---
 
-### 3. **FOOTER** (`src/components/Footer.tsx`)
+## Componentes compartidos
 
-**Propósito**: Información de contacto, redes sociales y legal
+### Cards
 
-**Características**:
-- **Fondo**: Negro con borde superior (`bg-black border-t border-gray-800`)
-- **Layout**: Grid de 2 columnas en desktop (`md:grid-cols-2`)
-- **Contenido**:
-  - **Columna Izquierda (Brand)**:
-    - Título "DevLokos"
-    - Copyright "© 2025 DevLokos"
-    - Links a Términos y Política de Privacidad (modales)
-  - **Columna Derecha (Contacto)**:
-    - Título "Contáctanos"
-    - Descripción
-    - Iconos de redes sociales (8 plataformas)
-    - Email: info@devlokos.com
+| Componente | Uso |
+|------------|-----|
+| `EpisodeCard` | Episodios podcast |
+| `TutorialCard` | Videos tutoriales |
+| `CourseCard` | Cursos academia |
+| `EventCard` | Eventos |
 
-**Espaciado**:
-- Margen superior: `mt-16 md:mt-24 lg:mt-32`
-- Padding vertical: `py-40 md:py-48 lg:py-56`
-- Gap entre columnas: `gap-8 sm:gap-10 md:gap-12 lg:gap-16 xl:gap-20`
+### UI (`src/components/ui/`)
 
-**Modales**:
-- `PrivacyPolicyModal`: Política de privacidad en español
-- `TermsModal`: Términos y condiciones en español
+| Componente | Uso |
+|------------|-----|
+| `button` | Botones con variantes CVA |
+| `input` | Campos de formulario |
+| `SearchBar` | Búsqueda con icono |
+| `SectionIntro` | Título + descripción de sección |
+| `EmptyState` | Estado vacío / error |
 
-**Estructura**:
-```
-Footer
-├── Grid (2 columnas)
-│   ├── Columna 1: Brand
-│   │   ├── Título
-│   │   ├── Copyright
-│   │   └── Links legales
-│   └── Columna 2: Contacto
-│       ├── Título
-│       ├── Descripción
-│       ├── Redes sociales (8 iconos)
-│       └── Email
-└── Modales (PrivacyPolicyModal, TermsModal)
+### Otros
+
+| Componente | Uso |
+|------------|-----|
+| `Logo` | Logo en NavBar |
+| `Footer` | Redes, email, links legales |
+| `PrivacyPolicyModal` | Política de privacidad |
+| `TermsModal` | Términos de servicio |
+| `AnalyticsProvider` | Screen views + eventos Firebase |
+
+---
+
+## Componente legacy
+
+**`HeroSection.tsx`** — Existe en el repositorio pero **no se importa en ninguna página**. Era parte de la landing original de una sola pantalla. Puede eliminarse o reutilizarse si se redefine la home.
+
+---
+
+## Patrones de implementación
+
+### Client vs Server Components
+
+- **Layout y páginas** — Server Components (metadata, JSON-LD)
+- **Secciones (`*Section.tsx`)** — Client Components (`'use client'`) por interactividad (fetch, modales, búsqueda)
+
+### Fetch de datos
+
+```tsx
+// Patrón típico en *Section.tsx
+useEffect(() => {
+  fetch('/api/episodes')
+    .then(res => res.json())
+    .then(data => setEpisodes(data.episodes));
+}, []);
 ```
 
----
+Las API routes manejan Remote Config, Firestore y YouTube server-side.
 
-## 🎨 Sistema de Diseño
+### Modales de video
 
-### Colores
-- **Primario**: `#ff914d` (Naranja) - `bg-primary`, `text-primary`
-- **Fondo**: `#000000` (Negro) - `bg-black`, `bg-background-dark`
-- **Texto**: `#ffffff` (Blanco) - `text-white`
-- **Grises**: Varios tonos para bordes y fondos secundarios
+Las secciones de podcast y tutoriales abren un overlay/modal con iframe o embed de YouTube al hacer clic en una card.
 
-### Tipografía
-- **Fuente Principal**: Eudoxus Sans (local, múltiples pesos)
-- **Tamaños Responsivos**: 
-  - Móvil: `text-4xl`, `text-base`
-  - Desktop: `md:text-5xl`, `md:text-lg`
+### Estilos
 
-### Espaciado
-- **Padding Horizontal**: `px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16`
-- **Padding Vertical Secciones**: `py-40 md:py-48 lg:py-56`
-- **Márgenes entre Secciones**: Variables según contexto
+- **Tailwind CSS 4** con variables en `globals.css`
+- Tema oscuro por defecto
+- Color primario de marca (`primary` = naranja DevLokos)
+- Mobile-first: breakpoints `sm`, `md`, `lg`
 
-### Breakpoints (Tailwind)
-- `sm`: 640px
-- `md`: 768px
-- `lg`: 1024px
-- `xl`: 1280px
+### Animaciones
+
+- **Framer Motion** en transiciones de secciones y cards
+- **`useScrollAnimation`** hook disponible para animaciones on-scroll
 
 ---
 
-## 📱 Responsive Design
-
-### Mobile First
-- Grid de episodios: 1 columna en móvil
-- NavBar: Menú hamburguesa en móvil
-- Footer: Stack vertical en móvil, grid en desktop
-
-### Centrado
-- Todos los contenedores principales usan `max-w-7xl mx-auto`
-- Contenido centrado con `flex justify-center items-center`
-- Texto centrado con `text-center`
-
----
-
-## 🔄 Flujo de Datos
-
-### PodcastSection
-1. **Carga inicial**: `useEffect` hace fetch a `/api/episodes`
-2. **API Route**: `src/app/api/episodes/route.ts`
-   - Obtiene API key de Firebase Remote Config
-   - Consulta YouTube Data API
-   - Retorna todos los episodios ordenados por fecha
-3. **Filtrado**: Cliente filtra por búsqueda (título/invitado)
-4. **Paginación**: Muestra 6 episodios por página
-5. **Modal**: Al hacer clic, abre modal con iframe de YouTube
-
----
-
-## 📦 Componentes Adicionales
-
-### Modales
-- **PrivacyPolicyModal**: Modal con scroll para política de privacidad
-- **TermsModal**: Modal con scroll para términos y condiciones
-
-**Características comunes**:
-- Fondo oscuro con blur (`bg-black/90 backdrop-blur-sm`)
-- Botón de cerrar (X) en esquina superior derecha
-- Cierre con ESC o click fuera del modal
-- Bloquea scroll del body cuando está abierto
-
----
-
-## 🎯 Puntos Clave de la Estructura
-
-1. **Modularidad**: Cada sección es un componente independiente
-2. **Reutilización**: Componentes pueden usarse en otras páginas
-3. **Mantenibilidad**: Fácil de modificar secciones individuales
-4. **Performance**: Componentes client-side solo donde es necesario (`'use client'`)
-5. **SEO**: Datos estructurados y metadatos en layout
-6. **Accesibilidad**: Labels ARIA, navegación por teclado, contraste adecuado
-
----
-
-## 🔍 Archivos Clave por Sección
+## Estructura de archivos UI
 
 ```
 src/
 ├── app/
-│   ├── layout.tsx          # Configuración global
-│   ├── page.tsx            # Orquestación de componentes
-│   ├── globals.css         # Estilos globales
-│   └── api/
-│       └── episodes/
-│           └── route.ts    # API para obtener episodios
-└── components/
-    ├── NavBar.tsx          # HEADER
-    ├── HeroSection.tsx     # HERO
-    ├── PodcastSection.tsx  # BODY (principal)
-    ├── Footer.tsx          # FOOTER
-    ├── PrivacyPolicyModal.tsx
-    └── TermsModal.tsx
+│   ├── layout.tsx          # Shell global
+│   ├── page.tsx            # Home
+│   ├── podcast/page.tsx
+│   ├── tutoriales/page.tsx
+│   ├── academia/page.tsx
+│   ├── empresarial/page.tsx
+│   ├── eventos/page.tsx
+│   └── globals.css
+├── components/
+│   ├── NavBar.tsx
+│   ├── Footer.tsx
+│   ├── Logo.tsx
+│   ├── PodcastSection.tsx
+│   ├── ContentSection.tsx
+│   ├── AcademySection.tsx
+│   ├── EnterpriseSection.tsx
+│   ├── CommunitySection.tsx
+│   ├── HeroSection.tsx     # LEGACY — no usado
+│   ├── EpisodeCard.tsx
+│   ├── TutorialCard.tsx
+│   ├── CourseCard.tsx
+│   ├── EventCard.tsx
+│   ├── AnalyticsProvider.tsx
+│   ├── PrivacyPolicyModal.tsx
+│   ├── TermsModal.tsx
+│   └── ui/
+│       ├── button.tsx
+│       ├── input.tsx
+│       ├── SearchBar.tsx
+│       ├── SectionIntro.tsx
+│       └── EmptyState.tsx
+├── lib/
+│   └── section-layout.ts
+└── hooks/
+    └── useScrollAnimation.ts
 ```
 
 ---
 
-## 💡 Mejores Prácticas Implementadas
+## Assets estáticos
 
-1. ✅ Separación de responsabilidades
-2. ✅ Componentes reutilizables
-3. ✅ Responsive design mobile-first
-4. ✅ Accesibilidad básica
-5. ✅ SEO optimizado
-6. ✅ Performance (lazy loading, optimización de imágenes)
-7. ✅ TypeScript para type safety
-8. ✅ Código limpio y mantenible
+Referenciados en metadata y componentes:
 
----
+| Archivo | Uso |
+|---------|-----|
+| `public/logo.png` | Open Graph, Twitter Cards |
+| `public/logo-transparent.png` | Logo en NavBar |
+| `public/favicon.png` | Favicon |
 
-## 🚀 Cómo Agregar una Nueva Sección
-
-1. Crear componente en `src/components/NuevaSeccion.tsx`
-2. Importar en `src/app/page.tsx`
-3. Agregar dentro de `<main>` después de `<PodcastSection />`
-4. Aplicar padding vertical consistente: `py-40 md:py-48 lg:py-56`
-5. Usar contenedor con `max-w-7xl mx-auto` para centrado
-
-Ejemplo:
-```tsx
-// En page.tsx
-<main>
-  <HeroSection />
-  <PodcastSection />
-  <NuevaSeccion />  {/* Nueva sección */}
-  <Footer />
-</main>
-```
+> Estos archivos pueden no estar en el repositorio. Ver [GUIA_DEPLOYMENT.md](GUIA_DEPLOYMENT.md) para instrucciones de assets.
 
 ---
 
-**Última actualización**: Enero 2025
-**Versión del proyecto**: DevLokos Landing Page v1.0
+## Documentación relacionada
 
+- [README.md](README.md) — Overview del proyecto
+- [docs/TUTORIALES_CONEXION.md](docs/TUTORIALES_CONEXION.md) — Integración técnica Tutoriales
+- [GUIA_DEPLOYMENT.md](GUIA_DEPLOYMENT.md) — Deploy y variables de entorno
