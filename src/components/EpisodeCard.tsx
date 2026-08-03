@@ -14,6 +14,8 @@ interface EpisodeCardProps {
   className?: string
   onClick?: () => void
   priority?: boolean
+  /** Compact rail card (Descubre) — shorter thumb, less body text */
+  compact?: boolean
 }
 
 export function EpisodeCard({
@@ -26,69 +28,76 @@ export function EpisodeCard({
   className,
   onClick,
   priority = false,
+  compact = false,
 }: EpisodeCardProps) {
   return (
     <motion.div
-      whileHover={{ y: -5 }}
+      whileHover={{ y: compact ? -2 : -4 }}
       onClick={onClick}
-      className={`flex flex-col rounded-xl overflow-hidden bg-[#0A0A0A] border border-white/5 group cursor-pointer ${className}`}
+      className={`flex flex-col rounded-xl overflow-hidden bg-[#0D0D0D] border border-primary/15 group cursor-pointer ${className ?? ""}`}
     >
-      <div className="relative h-64 bg-primary overflow-hidden group/thumbnail">
+      <div
+        className={`relative bg-zinc-900 overflow-hidden group/thumbnail ${
+          compact ? "h-36" : "h-44"
+        }`}
+      >
         {image && image !== "/placeholder.svg" ? (
           <>
             <Image
               src={image}
               alt={guest || title}
               fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              sizes="(max-width: 768px) 100vw, 300px"
               className="object-cover group-hover/thumbnail:scale-105 transition-transform duration-500"
               priority={priority}
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
-            <div className="absolute inset-0 bg-primary/15 group-hover/thumbnail:bg-primary/5 transition-colors duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
           </>
         ) : (
-          <div
-            className="absolute inset-0 opacity-20"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' fill='%23000000' fillOpacity='0.4' fillRule='evenodd'/%3E%3C/svg%3E")`,
-              backgroundSize: "30px 30px",
-            }}
-          />
+          <div className="absolute inset-0 bg-zinc-800" />
         )}
 
-        <div className="absolute top-3 right-3 z-10">
-          <span className="bg-black/90 text-white text-xs font-bold px-2 py-1 rounded-md backdrop-blur-sm flex items-center gap-1">
+        <div className="absolute top-2.5 right-2.5 z-10">
+          <span className="bg-black/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
             {duration}
           </span>
         </div>
 
         <div className="absolute inset-0 flex items-center justify-center z-10">
-          <motion.div
-            whileHover={{ scale: 1.15 }}
-            className="bg-white/95 rounded-full p-5 shadow-2xl cursor-pointer backdrop-blur-sm border-2 border-white/30"
+          <div
+            className={`rounded-full bg-primary/90 flex items-center justify-center ${
+              compact ? "w-9 h-9" : "w-11 h-11"
+            }`}
           >
-            <Play className="w-10 h-10 text-primary fill-primary ml-1" />
-          </motion.div>
+            <Play
+              className={`text-white fill-white ml-0.5 ${
+                compact ? "w-4 h-4" : "w-5 h-5"
+              }`}
+            />
+          </div>
         </div>
       </div>
 
-      <div className="p-5 flex flex-col flex-grow space-y-3">
-        <div>
-          {guest && (
-            <p className="text-zinc-400 text-xs font-medium mb-1">{guest}</p>
-          )}
-          <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 group-hover:text-primary transition-colors">
-            {title}
-          </h3>
-        </div>
+      <div className={`flex flex-col flex-grow ${compact ? "p-3 space-y-1.5" : "p-4 space-y-2"}`}>
+        {guest && (
+          <p className="text-zinc-500 text-[11px] font-medium truncate">{guest}</p>
+        )}
+        <h3
+          className={`text-white font-semibold leading-snug line-clamp-2 group-hover:text-primary transition-colors ${
+            compact ? "text-sm" : "text-base"
+          }`}
+        >
+          {title}
+        </h3>
 
-        <p className="text-zinc-500 text-sm line-clamp-3 leading-relaxed">{description}</p>
+        {!compact && (
+          <p className="text-zinc-500 text-sm line-clamp-2 leading-relaxed">{description}</p>
+        )}
 
         {episodeNumber != null && (
-          <div className="mt-auto pt-2">
-            <span className="text-[10px] text-zinc-600 font-mono">EPISODIO #{episodeNumber}</span>
-          </div>
+          <span className="text-[10px] text-zinc-600 font-mono pt-0.5">
+            EPISODIO #{episodeNumber}
+          </span>
         )}
       </div>
     </motion.div>

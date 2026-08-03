@@ -13,6 +13,7 @@ import { EmptyState } from "@/components/ui/EmptyState"
 import { ErrorState } from "@/components/ui/ErrorState"
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
 import { EpisodeCard } from "@/components/EpisodeCard"
+import { EpisodeListTile } from "@/components/EpisodeListTile"
 import { SECTION_CONTAINER } from "@/lib/section-layout"
 import {
   DEFAULT_SEASON_LABEL,
@@ -67,7 +68,7 @@ export default function PodcastSection() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedSeason, setSelectedSeason] = useState<string>(DEFAULT_SEASON_LABEL)
   const [currentPage, setCurrentPage] = useState(1)
-  const episodesPerPage = 6
+  const episodesPerPage = 20
   const discoverImpressedRef = useRef(false)
 
   const fetchEpisodes = async () => {
@@ -220,12 +221,17 @@ export default function PodcastSection() {
       {!loading && !error && (
         <>
           {!searchQuery.trim() && discoverEpisodes.length > 0 && (
-            <div className="space-y-6">
-              <SectionHeader title="Descubre" align="center" />
-              <AutoCarousel label="Episodios para descubrir" intervalMs={5000}>
+            <div className="space-y-4">
+              <SectionHeader title="Descubre" align="start" />
+              <AutoCarousel
+                label="Episodios para descubrir"
+                intervalMs={5000}
+                itemClassName="min-w-[240px] max-w-[260px] snap-start shrink-0"
+              >
                 {discoverEpisodes.map((episode) => (
                   <EpisodeCard
                     key={`discover-${episode.id}`}
+                    compact
                     title={episode.title}
                     guest={episode.guest}
                     duration={episode.duration}
@@ -239,10 +245,10 @@ export default function PodcastSection() {
             </div>
           )}
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             <SectionHeader
               title="Episodios"
-              align="center"
+              align="start"
               trailing={
                 !searchQuery.trim() ? (
                   <SeasonFilter value={selectedSeason} onChange={setSelectedSeason} />
@@ -252,21 +258,20 @@ export default function PodcastSection() {
 
             {paginatedEpisodes.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="flex flex-col gap-2.5 max-w-3xl">
                   {paginatedEpisodes.map((episode, index) => (
                     <motion.div
                       key={episode.id}
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 8 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ delay: index * 0.05 }}
+                      transition={{ delay: Math.min(index * 0.02, 0.3) }}
                     >
-                      <EpisodeCard
+                      <EpisodeListTile
                         title={episode.title}
                         guest={episode.guest}
                         duration={episode.duration}
                         image={episode.thumbnail || "/placeholder.svg"}
-                        description={episode.description}
                         episodeNumber={episode.id}
                         onClick={() => handleEpisodeClick(episode, 'list')}
                       />
@@ -275,7 +280,7 @@ export default function PodcastSection() {
                 </div>
 
                 {totalPages > 1 && (
-                  <div className="flex justify-center items-center gap-2 pt-8">
+                  <div className="flex justify-start items-center gap-2 pt-6 max-w-3xl">
                     <Button
                       variant="outline"
                       onClick={() => handlePageChange(currentPage - 1)}
