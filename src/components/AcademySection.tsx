@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from 'react';
 import Image from 'next/image';
-import { BookOpen, Check, ChevronDown, X, Clock, Layers, MessageCircle, SearchX, User } from 'lucide-react';
+import { BookOpen, Check, ChevronDown, GraduationCap, SearchX, User, X } from 'lucide-react';
 import { analyticsEvents } from '@/lib/analytics';
 import { learningPathLabel } from '@/lib/i18n-labels';
 import { SearchBar } from '@/components/ui/SearchBar';
@@ -22,26 +22,18 @@ const ACADEMY_WHATSAPP_MSG =
 
 function formatDuration(minutes: number | undefined): string {
   if (!minutes || minutes <= 0) return '';
-  if (minutes < 60) return `${minutes} min`;
+  if (minutes < 60) return `${minutes}m`;
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
-  return m ? `${h} h ${m} min` : `${h} h`;
+  return m ? `${h}h ${m}m` : `${h}h 0m`;
 }
 
 function difficultyLabel(d: string | undefined): string {
   const v = (d || '').toLowerCase();
-  if (v === 'beginner') return 'Principiante';
-  if (v === 'intermediate') return 'Intermedio';
-  if (v === 'advanced') return 'Avanzado';
+  if (v === 'beginner' || v === 'principiante') return 'Principiante';
+  if (v === 'intermediate' || v === 'intermedio') return 'Intermedio';
+  if (v === 'advanced' || v === 'avanzado') return 'Avanzado';
   return d || '—';
-}
-
-function difficultyBadgeClass(d: string | undefined): string {
-  const v = (d || '').toLowerCase();
-  if (v === 'beginner') return 'bg-green-500/20 text-green-400 border-green-500/30';
-  if (v === 'intermediate') return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
-  if (v === 'advanced') return 'bg-red-500/20 text-red-400 border-red-500/30';
-  return 'bg-zinc-500/20 text-zinc-400 border-zinc-500/30';
 }
 
 function normalize(s: string): string {
@@ -164,7 +156,6 @@ export default function AcademySection() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <MessageCircle className="w-4 h-4 mr-2" />
                   Consultar por WhatsApp
                 </a>
               </Button>
@@ -192,7 +183,7 @@ export default function AcademySection() {
                   className={`appearance-none border rounded-xl pl-4 pr-10 py-2 text-sm font-medium transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none cursor-pointer ${
                     filterPath
                       ? 'bg-primary/15 text-primary border-primary/70'
-                      : 'bg-[#0D0D0D] text-zinc-400 border-primary/15 hover:border-primary/40 hover:text-white'
+                      : 'bg-card-bg text-zinc-400 border-primary/15 hover:border-primary/40 hover:text-white'
                   }`}
                 >
                   <option value="">Ruta de aprendizaje</option>
@@ -217,7 +208,7 @@ export default function AcademySection() {
                   className={`appearance-none border rounded-xl pl-4 pr-10 py-2 text-sm font-medium transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none cursor-pointer ${
                     filterDifficulty
                       ? 'bg-primary/15 text-primary border-primary/70'
-                      : 'bg-[#0D0D0D] text-zinc-400 border-primary/15 hover:border-primary/40 hover:text-white'
+                      : 'bg-card-bg text-zinc-400 border-primary/15 hover:border-primary/40 hover:text-white'
                   }`}
                 >
                   <option value="">Dificultad</option>
@@ -237,7 +228,7 @@ export default function AcademySection() {
                     setFilterDifficulty('');
                     setSearch('');
                   }}
-                  className="rounded-xl px-4 py-2 text-sm font-medium bg-[#0D0D0D] text-zinc-400 border border-primary/15 hover:border-primary/40 hover:text-white transition-all"
+                  className="rounded-xl px-4 py-2 text-sm font-medium bg-card-bg text-zinc-400 border border-primary/15 hover:border-primary/40 hover:text-white transition-all"
                 >
                   Limpiar
                 </Button>
@@ -303,19 +294,23 @@ export default function AcademySection() {
               initial={{ opacity: 0, scale: 0.96, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ type: 'tween', duration: 0.2 }}
-              className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#0D0D0D] rounded-2xl border border-white/10 shadow-2xl"
+              className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-card-bg rounded-2xl border border-primary/25 shadow-[0_12px_40px_rgba(255,145,77,0.08)]"
               onClick={(e) => e.stopPropagation()}
             >
+              <div
+                aria-hidden
+                className="h-1 w-full bg-gradient-to-r from-primary via-primary/70 to-transparent"
+              />
               <button
                 onClick={() => setSelectedCourse(null)}
-                className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+                className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-primary/20 text-white flex items-center justify-center transition-colors"
                 aria-label="Cerrar"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              {selectedCourse.thumbnailUrl && (
-                <div className="relative w-full h-44 sm:h-52 bg-zinc-900 rounded-t-2xl overflow-hidden">
+              <div className="relative w-full h-48 sm:h-56 bg-zinc-900 overflow-hidden">
+                {selectedCourse.thumbnailUrl ? (
                   <Image
                     src={selectedCourse.thumbnailUrl}
                     alt={selectedCourse.title}
@@ -323,61 +318,77 @@ export default function AcademySection() {
                     className="object-cover"
                     sizes="(max-width: 672px) 100vw, 672px"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-transparent to-transparent opacity-80" />
-                </div>
-              )}
-
-              <div className="p-6 sm:p-8">
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  {selectedCourse.difficulty && (
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${difficultyBadgeClass(selectedCourse.difficulty)}`}>
-                      {difficultyLabel(selectedCourse.difficulty)}
-                    </span>
-                  )}
-                  {selectedCourse.duration && selectedCourse.duration > 0 && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white/10 text-zinc-400 border border-white/10">
-                      <Clock className="w-3.5 h-3.5" />
-                      {formatDuration(selectedCourse.duration)}
-                    </span>
-                  )}
-                  {(selectedCourse.modules?.length ?? 0) > 0 && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white/10 text-zinc-400 border border-white/10">
-                      <Layers className="w-3.5 h-3.5" />
-                      {selectedCourse.modules!.length} módulos
-                    </span>
-                  )}
-                </div>
-
-                <h2 className="text-xl sm:text-2xl font-bold text-white pr-10 mb-4">{selectedCourse.title}</h2>
-
-                {selectedCourse.professor && (
-                  <p className="flex items-center gap-2 text-zinc-400 text-sm mb-4">
-                    <User className="w-4 h-4 text-primary shrink-0" />
-                    <span>Instructor: <span className="text-white font-medium">{selectedCourse.professor}</span></span>
-                  </p>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-primary/70">
+                    <BookOpen className="w-16 h-16" />
+                  </div>
                 )}
+                <div className="absolute inset-0 bg-gradient-to-t from-card-bg via-transparent to-transparent opacity-90" />
+              </div>
 
-                {selectedCourse.learningPaths && selectedCourse.learningPaths.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {selectedCourse.learningPaths.map((path) => (
-                      <span key={path} className="px-2.5 py-1 bg-primary/15 text-primary rounded-lg text-xs font-medium border border-primary/30">
-                        {learningPathLabel(path)}
+              <div className="p-6 sm:p-8 space-y-5">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white pr-10 leading-tight">
+                  {selectedCourse.title}
+                </h2>
+
+                <div className="rounded-2xl border border-primary/22 bg-black/40 p-4 space-y-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    {selectedCourse.difficulty && (
+                      <span className="inline-flex items-center gap-1.5 text-white text-sm font-semibold">
+                        <GraduationCap className="w-4 h-4" />
+                        {difficultyLabel(selectedCourse.difficulty)}
                       </span>
-                    ))}
+                    )}
+                    {selectedCourse.duration && selectedCourse.duration > 0 && (
+                      <span className="text-zinc-400 text-sm font-medium ml-auto">
+                        {formatDuration(selectedCourse.duration)}
+                      </span>
+                    )}
+                  </div>
+                  {selectedCourse.professor && (
+                    <p className="inline-flex items-center gap-1.5 text-white text-sm font-medium">
+                      <User className="w-4 h-4" />
+                      {selectedCourse.professor}
+                    </p>
+                  )}
+                  {selectedCourse.learningPaths && selectedCourse.learningPaths.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedCourse.learningPaths.map((path) => (
+                        <span
+                          key={path}
+                          className="px-2.5 py-1 bg-primary/12 text-primary rounded-full text-xs font-semibold border border-primary/35"
+                        >
+                          {learningPathLabel(path)}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {selectedCourse.description && (
+                  <div>
+                    <div className="flex items-center gap-2.5 mb-2.5">
+                      <span className="w-0.5 h-4 rounded-full bg-primary" />
+                      <h3 className="text-primary font-semibold text-sm">Descripción</h3>
+                    </div>
+                    <p className="text-zinc-300 text-sm sm:text-base leading-relaxed">
+                      {selectedCourse.description}
+                    </p>
                   </div>
                 )}
 
-                {selectedCourse.description && (
-                  <p className="text-zinc-400 text-sm sm:text-base leading-relaxed mb-6">{selectedCourse.description}</p>
-                )}
-
                 {(selectedCourse.learningObjectives ?? []).length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-white font-semibold text-sm mb-3">Qué aprenderás</h3>
-                    <ul className="space-y-2">
+                  <div>
+                    <div className="flex items-center gap-2.5 mb-3">
+                      <span className="w-0.5 h-4 rounded-full bg-primary" />
+                      <h3 className="text-primary font-semibold text-sm">Qué aprenderás</h3>
+                    </div>
+                    <ul className="space-y-2.5">
                       {(selectedCourse.learningObjectives ?? []).map((obj, i) => (
-                        <li key={i} className="flex items-start gap-2 text-zinc-400 text-sm">
-                          <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                        <li key={i} className="flex items-start gap-2.5 text-zinc-300 text-sm">
+                          <span className="mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-primary/15">
+                            <Check className="w-3 h-3 text-primary" />
+                          </span>
                           <span>{obj}</span>
                         </li>
                       ))}
@@ -386,12 +397,18 @@ export default function AcademySection() {
                 )}
 
                 {(selectedCourse.modules?.length ?? 0) > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-white font-semibold text-sm mb-3">Contenido del curso</h3>
+                  <div>
+                    <div className="flex items-center gap-2.5 mb-3">
+                      <span className="w-0.5 h-4 rounded-full bg-primary" />
+                      <h3 className="text-primary font-semibold text-sm">Contenido del curso</h3>
+                    </div>
                     <ol className="space-y-2">
                       {selectedCourse.modules!.map((mod, i) => (
-                        <li key={i} className="flex items-center gap-2 text-zinc-400 text-sm">
-                          <span className="flex w-6 h-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-medium text-zinc-400">
+                        <li
+                          key={i}
+                          className="flex items-center gap-3 rounded-xl border border-primary/14 bg-black/35 px-3 py-3 text-sm text-white"
+                        >
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/14 text-xs font-bold text-primary">
                             {i + 1}
                           </span>
                           {mod.title ?? `Módulo ${i + 1}`}
@@ -406,9 +423,8 @@ export default function AcademySection() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => analyticsEvents.academy_whatsapp_clicked(selectedCourse.title)}
-                  className="inline-flex items-center justify-center gap-2 w-full py-3.5 px-5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-colors"
+                  className="inline-flex items-center justify-center w-full py-3.5 px-5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-colors shadow-[0_8px_24px_rgba(255,145,77,0.25)]"
                 >
-                  <MessageCircle className="w-5 h-5" />
                   Inscribirme por WhatsApp
                 </a>
               </div>

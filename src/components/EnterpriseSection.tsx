@@ -493,17 +493,17 @@ function PortfolioGrid({
   }, [items, filter]);
 
   return (
-    <div>
-      <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
+    <div className="w-full">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-4 md:mb-5">
         <div>
           <SectionHeader title="Portafolio" align="start" className="mb-1" />
-          <p className="text-zinc-500 text-sm">
+          <p className="text-zinc-500 text-sm md:text-base">
             {items.length} proyectos entregados — apps, web y productos reales.
           </p>
         </div>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-3 mb-5 scrollbar-none">
+      <div className="flex flex-wrap gap-2 mb-5 md:mb-6">
         {PORTFOLIO_FILTERS.map((f) => (
           <Chip key={f} active={filter === f} onClick={() => onFilterChange(f)}>
             {f}
@@ -514,44 +514,44 @@ function PortfolioGrid({
       {filtered.length === 0 ? (
         <p className="text-zinc-500 text-sm py-8">No hay proyectos en esta categoría.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl">
+        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
           {filtered.map((p) => {
             const cardClassName =
-              'group rounded-2xl overflow-hidden bg-card-bg border border-primary/15 hover:border-primary/45 transition-colors text-left block shadow-[0_12px_40px_rgba(255,145,77,0.04)]';
+              'group h-full flex flex-col rounded-2xl overflow-hidden bg-card-bg border border-primary/15 hover:border-primary/45 transition-colors text-left shadow-[0_12px_40px_rgba(255,145,77,0.04)]';
             const inner = (
               <>
-                <div className="relative aspect-[5/4] bg-zinc-900 overflow-hidden">
+                <div className="relative aspect-[4/3] sm:aspect-[5/4] bg-zinc-900 overflow-hidden shrink-0">
                   {p.thumbnailUrl ? (
                     <Image
                       src={p.thumbnailUrl}
                       alt={p.title}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
+                      sizes="(max-width: 419px) 100vw, (max-width: 767px) 50vw, (max-width: 1279px) 33vw, 25vw"
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/15 via-zinc-900 to-black text-zinc-600">
-                      <FolderOpen className="w-12 h-12" />
+                      <FolderOpen className="w-10 h-10 sm:w-12 sm:h-12" />
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
                   {p.category && (
-                    <span className="absolute left-3 top-3 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md bg-white text-black">
+                    <span className="absolute left-2.5 top-2.5 sm:left-3 sm:top-3 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md bg-white text-black">
                       {p.category}
                     </span>
                   )}
                 </div>
-                <div className="p-4 space-y-2">
-                  <h4 className="text-white font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                <div className="p-3.5 sm:p-4 md:p-5 flex flex-col flex-1 gap-1.5 sm:gap-2">
+                  <h4 className="text-white text-sm sm:text-base font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
                     {p.title}
                   </h4>
                   {p.description && (
-                    <p className="text-zinc-400 text-sm line-clamp-2 leading-relaxed">
+                    <p className="text-zinc-400 text-xs sm:text-sm line-clamp-2 md:line-clamp-3 leading-relaxed">
                       {p.description}
                     </p>
                   )}
                   {p.technologies && p.technologies.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-1">
+                    <div className="hidden sm:flex flex-wrap gap-1.5 pt-0.5">
                       {p.technologies.slice(0, 3).map((t) => (
                         <span
                           key={t}
@@ -561,13 +561,15 @@ function PortfolioGrid({
                         </span>
                       ))}
                       {p.technologies.length > 3 && (
-                        <span className="px-2 py-0.5 rounded-full text-[11px] text-zinc-500">
+                        <span className="px-2 py-0.5 text-[11px] text-zinc-500">
                           +{p.technologies.length - 3}
                         </span>
                       )}
                     </div>
                   )}
-                  <p className="text-primary text-sm font-semibold pt-1">Ver proyecto</p>
+                  <p className="text-primary text-xs sm:text-sm font-semibold mt-auto pt-2">
+                    Ver proyecto
+                  </p>
                 </div>
               </>
             );
