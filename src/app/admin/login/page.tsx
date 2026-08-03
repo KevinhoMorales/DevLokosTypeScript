@@ -92,24 +92,14 @@ export default function AdminLoginPage() {
               {user.email} no está registrado en la colección admin.
             </p>
           </div>
-          <div className="flex flex-col gap-2">
-            <Button
-              onClick={async () => {
-                await logout();
-              }}
-              className="w-full h-12 bg-primary hover:bg-primary/90"
-            >
-              Probar otra cuenta
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={close}
-              className="w-full h-11 text-zinc-400 hover:text-white"
-            >
-              Volver al sitio
-            </Button>
-          </div>
+          <Button
+            onClick={async () => {
+              await logout();
+            }}
+            className="w-full h-12 bg-primary hover:bg-primary/90"
+          >
+            Probar otra cuenta
+          </Button>
         </div>
       </div>
     );
