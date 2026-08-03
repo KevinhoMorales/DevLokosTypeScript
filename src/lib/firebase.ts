@@ -10,8 +10,12 @@ import {
   type User,
 } from 'firebase/auth';
 
+// apiKey de cliente Firebase es pública (también está en la app móvil).
+// Preferir NEXT_PUBLIC_* en env; el fallback evita romper /admin/login en prod.
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  apiKey:
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
+    'AIzaSyCSVo_XuC7P_oLbwbAa6V4zyaQ93MrhsO4',
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'devlokos.firebaseapp.com',
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'devlokos',
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'devlokos.firebasestorage.app',
@@ -22,6 +26,11 @@ const firebaseConfig = {
 
 const hasFirebaseConfig =
   typeof firebaseConfig.apiKey === 'string' && firebaseConfig.apiKey.length > 0;
+
+/** True si hay API key de cliente (env o fallback). No implica Admin SDK. */
+export function isFirebaseConfigured(): boolean {
+  return hasFirebaseConfig;
+}
 
 let app: FirebaseApp | undefined;
 let analytics: Analytics | undefined;

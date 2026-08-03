@@ -142,6 +142,7 @@ input[type="search"]::-moz-search-cancel-button {
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -155,6 +156,18 @@ input[type="search"]::-moz-search-cancel-button {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+/* Descubre rail: hide native scrollbar entirely */
+.discover-rail {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.discover-rail::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* Utility classes */
