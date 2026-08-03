@@ -36,14 +36,19 @@ export default function AdminPortfolioPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold">Portfolio</h1>
+        <h1 className="text-2xl font-bold">Portafolio</h1>
         <Button asChild className="bg-primary">
           <Link href="/admin/portfolio/new">Nuevo proyecto</Link>
         </Button>
       </div>
       {loading && <AppLoading />}
       {error && <EmptyState title="Error" subtitle={error} action={<Button onClick={load}>Reintentar</Button>} />}
-      {!loading && !error && items.length === 0 && <EmptyState title="Sin proyectos" subtitle="Crea el primero." />}
+      {!loading && !error && items.length === 0 && (
+        <EmptyState
+          title="Sin proyectos"
+          subtitle="Ejecuta npm run sync:portfolio o crea el primero desde aquí."
+        />
+      )}
       {!loading && items.length > 0 && (
         <ul className="divide-y divide-white/10 border border-white/10 rounded-xl overflow-hidden">
           {items.map((p) => (

@@ -1,7 +1,8 @@
 /**
- * Upsert de proyectos DevLokos Enterprise (content/portfolio-seed.json) a Firestore `portfolio`.
+ * Upsert del portafolio completo (content/portfolio-seed.json → Firestore `portfolio`).
+ * Fuente: proyectos de kevinhomorales.com (apps, web y productos entregados).
  *
- * Uso: npx tsx scripts/sync-portfolio.ts
+ * Uso: npm run sync:portfolio
  */
 import { readFileSync } from 'fs';
 import { resolve } from 'path';

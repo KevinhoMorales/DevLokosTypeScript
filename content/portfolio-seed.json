@@ -1,20 +1,5 @@
 [
   {
-    "id": "saints",
-    "title": "SAINTS",
-    "description": "App multiplataforma en Flutter del Saints Wellness Club®: comunidad de running en Santo Domingo, Ecuador, con el lema Run & Have Fun! Conecta corredores con entrenamientos, trail, eventos, carreras como Saints Trail y 8K Tenka Run, bienestar y la vida social del club desde iOS y Android.",
-    "thumbnailUrl": "https://kevinhomorales.com/images/saints-icon.png",
-    "technologies": [
-      "Dart",
-      "Flutter"
-    ],
-    "category": "Mobile",
-    "projectUrl": "https://apps.apple.com/us/app/saints/id6792610093",
-    "caseStudyUrl": null,
-    "isPublished": true,
-    "order": -20260701
-  },
-  {
     "id": "tayos",
     "title": "Tayos",
     "description": "App B2B de repuestos automotrices para la distribuidora más grande del Ecuador — catálogo digital con 30.000+ productos, búsqueda rápida y pedidos para talleres y empresas.",
@@ -23,11 +8,42 @@
       "React Native",
       "TypeScript"
     ],
-    "category": "Mobile",
+    "category": "iOS",
     "projectUrl": "https://devlokos.com/enterprise",
     "caseStudyUrl": null,
     "isPublished": true,
     "order": -20260715
+  },
+  {
+    "id": "saints",
+    "title": "SAINTS",
+    "description": "App multiplataforma en Flutter del Saints Wellness Club®: comunidad de running en Santo Domingo, Ecuador, con el lema Run & Have Fun! Conecta corredores con entrenamientos, trail, eventos, carreras como Saints Trail y 8K Tenka Run, bienestar y la vida social del club desde iOS y Android.",
+    "thumbnailUrl": "https://kevinhomorales.com/images/saints-icon.png",
+    "technologies": [
+      "Dart",
+      "Flutter"
+    ],
+    "category": "Flutter",
+    "projectUrl": "https://apps.apple.com/us/app/saints/id6792610093",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -20260701
+  },
+  {
+    "id": "santo-domingo-pickleball-club",
+    "title": "Santo Domingo Pickleball Club",
+    "description": "Sitio web oficial del Santo Domingo Pickleball Club: promueve el pickleball en Ecuador con entrenamientos para todos los niveles, torneos, información de canchas, inscripción al Santo Domingo Pickleball Open 2026 y una comunidad deportiva inclusiva en Santo Domingo de los Tsáchilas.",
+    "thumbnailUrl": "https://kevinhomorales.com/images/santo-domingo-pickleball-club-icon.png",
+    "technologies": [
+      "Next.js",
+      "React",
+      "TypeScript"
+    ],
+    "category": "Web",
+    "projectUrl": "https://www.santodomingopickleballclub.com/",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -20260601
   },
   {
     "id": "orion-solar-group",
@@ -47,20 +63,94 @@
     "order": -20260501
   },
   {
-    "id": "santo-domingo-pickleball-club",
-    "title": "Santo Domingo Pickleball Club",
-    "description": "Sitio web oficial del Santo Domingo Pickleball Club: promueve el pickleball en Ecuador con entrenamientos para todos los niveles, torneos, información de canchas, inscripción al Santo Domingo Pickleball Open 2026 y una comunidad deportiva inclusiva en Santo Domingo de los Tsáchilas.",
-    "thumbnailUrl": "https://kevinhomorales.com/images/santo-domingo-pickleball-club-icon.png",
+    "id": "padeltrack",
+    "title": "PadelTrack",
+    "description": "PadelTrack registra partidos, estadísticas y progreso en pádel: app multiplataforma en Flutter (Dart) para iOS y Android.",
+    "thumbnailUrl": null,
     "technologies": [
-      "Next.js",
-      "React",
-      "TypeScript"
+      "Dart",
+      "Flutter"
     ],
-    "category": "Web",
-    "projectUrl": "https://www.santodomingopickleballclub.com/",
+    "category": "Flutter",
+    "projectUrl": "https://apps.apple.com/ec/app/padeltrack/id6749497707",
     "caseStudyUrl": null,
     "isPublished": true,
-    "order": -20260601
+    "order": -20251201
+  },
+  {
+    "id": "devlokos-app",
+    "title": "DevLokos",
+    "description": "App multiplataforma del podcast DevLokos en Flutter: escucha episodios, explora contenido de la comunidad y accede a recursos para desarrolladores desde iOS y Android.",
+    "thumbnailUrl": null,
+    "technologies": [
+      "Dart",
+      "Flutter"
+    ],
+    "category": "Flutter",
+    "projectUrl": "https://devlokos.com/",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -20251028
+  },
+  {
+    "id": "elite-padel",
+    "title": "Élite Padel: Ranking Oficial",
+    "description": "App oficial de ranking de Élite Padel Santo Domingo: consulta posiciones, estadísticas y torneos de la comunidad de pádel en Ecuador. Desarrollada nativamente con SwiftUI en iOS y Jetpack Compose en Android.",
+    "thumbnailUrl": "https://kevinhomorales.com/images/elite-padel-icon.png",
+    "technologies": [
+      "SwiftUI",
+      "Jetpack Compose"
+    ],
+    "category": "iOS",
+    "projectUrl": "https://apps.apple.com/jm/app/%C3%A9lite-padel-ranking-oficial/id6742730017",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -20250901
+  },
+  {
+    "id": "security-force-residentes",
+    "title": "Security Force Residentes",
+    "description": "App para residentes de urbanizaciones Security Force: genera códigos QR únicos para ingreso seguro y contactless en comunidades residenciales protegidas.",
+    "thumbnailUrl": null,
+    "technologies": [
+      "Swift",
+      "Kotlin"
+    ],
+    "category": "iOS",
+    "projectUrl": "https://apps.apple.com/ec/app/security-force-residentes/id1621974359",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -996
+  },
+  {
+    "id": "macro-empresas",
+    "title": "Macro Empresas",
+    "description": "Banca móvil empresarial de Banco Macro en iOS y Android: operaciones corporativas, seguridad financiera y canales digitales para clientes enterprise (Technisys).",
+    "thumbnailUrl": null,
+    "technologies": [
+      "Swift",
+      "Java"
+    ],
+    "category": "iOS",
+    "projectUrl": "https://apps.apple.com/us/app/macro-empresas/id1465765093",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -995
+  },
+  {
+    "id": "meniuz",
+    "title": "Meniuz",
+    "description": "App de pedidos Meniuz para descubrir menús, restaurantes y ofertas gastronómicas con experiencia nativa en iOS y Android.",
+    "thumbnailUrl": null,
+    "technologies": [
+      "Swift",
+      "Kotlin"
+    ],
+    "category": "iOS",
+    "projectUrl": "https://apps.apple.com/us/app/meniuz/id1563662812",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -994
   },
   {
     "id": "devlokos",
@@ -77,51 +167,64 @@
     "projectUrl": "https://devlokos.com/",
     "caseStudyUrl": null,
     "isPublished": true,
-    "order": -996
+    "order": -993
   },
   {
-    "id": "devlokos-app",
-    "title": "DevLokos",
-    "description": "App multiplataforma del podcast DevLokos en Flutter: escucha episodios, explora contenido de la comunidad y accede a recursos para desarrolladores desde iOS y Android.",
+    "id": "banco-de-loja",
+    "title": "Banco de Loja",
+    "description": "App de referencia oficial del Banco de Loja: consulta de productos, servicios financieros e información institucional del banco ecuatoriano.",
     "thumbnailUrl": null,
     "technologies": [
-      "Dart",
-      "Flutter"
+      "Swift"
     ],
-    "category": "Mobile",
-    "projectUrl": "https://devlokos.com/",
+    "category": "iOS",
+    "projectUrl": "https://apps.apple.com/ec/app/banco-de-loja/id1396238600",
     "caseStudyUrl": null,
     "isPublished": true,
-    "order": -995
+    "order": -990
   },
   {
-    "id": "padeltrack",
-    "title": "PadelTrack",
-    "description": "Padel sports tracking app",
+    "id": "calcustom",
+    "title": "Calcustom",
+    "description": "Utilidad de calendario personalizable para iPhone, iPad, Mac y Apple Watch: organiza eventos y agenda con experiencia nativa en el ecosistema Apple.",
     "thumbnailUrl": null,
     "technologies": [
-      "Dart",
-      "Flutter"
+      "Swift"
     ],
-    "category": "Mobile",
-    "projectUrl": "https://apps.apple.com/ec/app/padeltrack/id6749497707",
+    "category": "iOS",
+    "projectUrl": "https://apps.apple.com/us/app/calcustom/id1561896744",
     "caseStudyUrl": null,
     "isPublished": true,
-    "order": -20251201
+    "order": -989
   },
   {
-    "id": "elite-padel",
-    "title": "Élite Padel: Ranking Oficial",
-    "description": "App oficial de ranking de Élite Padel Santo Domingo: consulta posiciones, estadísticas y torneos de la comunidad de pádel en Ecuador. Desarrollada nativamente con SwiftUI en iOS y Jetpack Compose en Android.",
-    "thumbnailUrl": "https://kevinhomorales.com/images/elite-padel-icon.png",
+    "id": "yippy-cerca-de-ti",
+    "title": "Yippy: Cerca de ti",
+    "description": "Yippy Cerca de ti conecta compradores con comercios locales: ofertas, tiendas cercanas y shopping en iOS y Android.",
+    "thumbnailUrl": null,
     "technologies": [
-      "SwiftUI",
+      "Swift",
+      "Java"
+    ],
+    "category": "iOS",
+    "projectUrl": "https://apps.apple.com/us/app/yippy-cerca-de-ti/id1506152885",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -988
+  },
+  {
+    "id": "livo-home",
+    "title": "Livo Home",
+    "description": "App lifestyle Livo Home para gestión de propiedades y hogar: servicios, información residencial y experiencia conectada para propietarios e inquilinos.",
+    "thumbnailUrl": null,
+    "technologies": [
+      "Swift",
       "Jetpack Compose"
     ],
-    "category": "Mobile",
-    "projectUrl": "https://apps.apple.com/jm/app/%C3%A9lite-padel-ranking-oficial/id6742730017",
+    "category": "Android",
+    "projectUrl": "https://apps.apple.com/es/app/livo-home/id1669247260",
     "caseStudyUrl": null,
     "isPublished": true,
-    "order": -20250901
+    "order": -987
   }
 ]

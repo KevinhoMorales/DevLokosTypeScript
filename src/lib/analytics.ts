@@ -200,6 +200,13 @@ export const analyticsEvents = {
   products_viewed() {
     logEvent('products_viewed');
   },
+  product_viewed(product_id: string, product_title: string, product_type?: string) {
+    logEvent('product_viewed', {
+      product_id: truncate(product_id),
+      product_title: truncate(product_title),
+      ...(product_type ? { product_type: truncate(product_type) } : {}),
+    });
+  },
   product_store_clicked(product_id: string, store_label: string) {
     logEvent('product_store_clicked', {
       product_id: truncate(product_id),
