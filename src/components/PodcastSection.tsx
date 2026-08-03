@@ -14,6 +14,7 @@ import { ErrorState } from "@/components/ui/ErrorState"
 import { EpisodeCard } from "@/components/EpisodeCard"
 import { EpisodeListTile } from "@/components/EpisodeListTile"
 import { SECTION_CONTAINER } from "@/lib/section-layout"
+import { ONELINK_URL } from "@/lib/site"
 import {
   DEFAULT_SEASON_LABEL,
   emptySeasonMessage,
@@ -230,13 +231,16 @@ export default function PodcastSection() {
     const lines = [
       `Descubre el episodio "${episode.title}"${guest ? ` con ${guest}` : ""}`,
       "",
+      "Descarga DevLokos y accede a más episodios:",
+      ONELINK_URL,
+      "",
       "Ver en YouTube:",
       episode.youtubeUrl,
     ]
     const text = lines.join("\n")
     try {
       if (navigator.share) {
-        await navigator.share({ title: episode.title, text, url: episode.youtubeUrl })
+        await navigator.share({ title: episode.title, text, url: ONELINK_URL })
       } else {
         await navigator.clipboard.writeText(text)
       }
