@@ -6,6 +6,8 @@ import { detectSeasonFromTitle, type SeasonNumber } from '@/lib/podcast-seasons'
 interface PodcastEpisode {
   id: number;
   title: string;
+  /** Título original de YouTube (con ||). */
+  rawTitle: string;
   description: string;
   thumbnail: string;
   spotifyUrl: string;
@@ -45,19 +47,24 @@ export async function GET() {
     );
 
     const episodes: PodcastEpisode[] = youtubeVideos.map((video, index) => {
-      // Formato: "DevLokos S2 Ep078 || Título || Invitado"
-      const titleParts = video.title.split('||').map(part => part.trim());
-      const episodeTitle = titleParts.length > 1 ? titleParts[1] : video.title;
-      const guest = titleParts.length > 2 ? titleParts[2] : undefined;
-
-      const description = video.description.length > 200 
-        ? video.description.substring(0, 200) + '...'
-        : video.description;
+      // Formato típico: "DevLokos S2 Ep078 || Título || Invitado"
+      const titleParts = video.title.split('||').map((part) => part.trim());
+      let episodeTitle = video.title;
+      let guest: string | undefined;
+      if (titleParts.length >= 3) {
+        episodeTitle = titleParts[1] || video.title;
+        guest = titleParts[2] || undefined;
+      } else if (titleParts.length === 2) {
+        episodeTitle = titleParts[0] || video.title;
+        guest = titleParts[1] || undefined;
+      }
 
       return {
         id: index + 1,
         title: episodeTitle,
-        description: description,
+        // Título completo de YouTube (como en la app / lista).
+        rawTitle: video.title,
+        description: video.description || 'Sin descripción disponible.',
         thumbnail: video.thumbnail,
         spotifyUrl: SPOTIFY_SHOW_URL,
         youtubeUrl: `https://www.youtube.com/watch?v=${video.videoId}`,

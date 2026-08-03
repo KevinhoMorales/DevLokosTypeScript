@@ -267,14 +267,14 @@ export default function EnterpriseSection() {
   const displayServices = services.length > 0 ? services : FALLBACK_SERVICES;
 
   return (
-    <section id="enterprise-section" className={`${SECTION_CONTAINER} bg-black space-y-14`}>
+    <section id="enterprise-section" className={`${SECTION_CONTAINER} bg-black space-y-10`}>
       <SectionIntro>
         Software a medida y consultoría para empresas. Proceso claro, servicios concretos y contacto cuando estés listo.
       </SectionIntro>
 
       <div>
-        <SectionHeader title="Nuestro proceso" align="center" className="mb-6" />
-        <div className="grid grid-cols-2 gap-3 max-w-3xl mx-auto">
+        <SectionHeader title="Nuestro proceso" align="start" className="mb-4" />
+        <div className="grid grid-cols-2 gap-2.5 max-w-3xl">
           {PROCESS_STEPS.map((step, i) => (
             <motion.div
               key={step.label}
@@ -282,13 +282,13 @@ export default function EnterpriseSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
-              className="rounded-2xl bg-[#0D0D0D] border border-primary/15 p-4 text-left"
+              className="rounded-2xl bg-[#0D0D0D] border border-primary/15 p-3.5 text-left"
             >
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-2">
                 <step.icon className="w-5 h-5 text-primary" />
                 <span className="text-primary text-xs font-bold tracking-wide">{step.num}</span>
               </div>
-              <p className="text-white font-semibold text-sm md:text-base">{step.label}</p>
+              <p className="text-white font-semibold text-sm">{step.label}</p>
             </motion.div>
           ))}
         </div>
@@ -296,14 +296,14 @@ export default function EnterpriseSection() {
 
       {!loading && (
         <div>
-          <SectionHeader title="Servicios" align="center" className="mb-6" />
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+          <SectionHeader title="Servicios" align="start" className="mb-4" />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 max-w-5xl">
             {displayServices.map((s) => {
               const Icon = serviceIcon(s.icon);
               return (
                 <div
                   key={s.id}
-                  className="p-5 rounded-2xl bg-[#0D0D0D] border border-primary/15 hover:border-primary/40 transition-colors"
+                  className="p-4 rounded-2xl bg-[#0D0D0D] border border-primary/15 hover:border-primary/40 transition-colors"
                 >
                   <div className="flex items-start gap-3">
                     <div className="w-11 h-11 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
@@ -338,12 +338,12 @@ export default function EnterpriseSection() {
 
       {!loading && portfolio.length > 0 && (
         <div>
-          <SectionHeader title="Portafolio" align="center" className="mb-6" />
-          <div className="overflow-x-auto flex gap-4 pb-4 snap-x snap-mandatory md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-visible max-w-5xl mx-auto">
+          <SectionHeader title="Portafolio" align="start" className="mb-4" />
+          <div className="overflow-x-auto flex gap-3 pb-4 snap-x snap-mandatory md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-visible max-w-5xl">
             {portfolio.map((p) => (
               <div
                 key={p.id}
-                className="flex-shrink-0 w-[280px] md:w-full snap-center rounded-2xl overflow-hidden bg-[#0D0D0D] border border-primary/15 hover:border-primary/40 transition-colors"
+                className="flex-shrink-0 w-[260px] md:w-full snap-center rounded-2xl overflow-hidden bg-[#0D0D0D] border border-primary/15 hover:border-primary/40 transition-colors"
               >
                 <div className="relative aspect-video bg-zinc-900">
                   {p.thumbnailUrl ? (

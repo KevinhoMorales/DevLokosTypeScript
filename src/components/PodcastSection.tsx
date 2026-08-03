@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, useState, useRef, useMemo } from 'react'
-import { SearchX } from "lucide-react"
-import { analyticsEvents } from '@/lib/analytics'
+import { useEffect, useState, useRef, useMemo } from "react"
+import { Calendar, Clock, SearchX, Share2, X } from "lucide-react"
+import { analyticsEvents } from "@/lib/analytics"
 import { Button } from "@/components/ui/button"
 import { SectionIntro } from "@/components/ui/SectionIntro"
 import { SearchBar } from "@/components/ui/SearchBar"
@@ -11,7 +11,6 @@ import { SectionHeader } from "@/components/ui/SectionHeader"
 import { AutoCarousel } from "@/components/ui/AutoCarousel"
 import { EmptyState } from "@/components/ui/EmptyState"
 import { ErrorState } from "@/components/ui/ErrorState"
-import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
 import { EpisodeCard } from "@/components/EpisodeCard"
 import { EpisodeListTile } from "@/components/EpisodeListTile"
 import { SECTION_CONTAINER } from "@/lib/section-layout"
@@ -26,6 +25,7 @@ import { motion } from "framer-motion"
 interface PodcastEpisode {
   id: number
   title: string
+  rawTitle?: string
   description: string
   thumbnail: string
   spotifyUrl: string
@@ -40,23 +40,45 @@ interface PodcastEpisode {
 function getYouTubeVideoId(url: string): string | null {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
   const match = url.match(regExp)
-  return (match && match[2].length === 11) ? match[2] : null
+  return match && match[2].length === 11 ? match[2] : null
 }
 
 function normalizeText(text: string): string {
   return text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
 }
 
-function pickDiscoverEpisodes(all: PodcastEpisode[], count = 4): PodcastEpisode[] {
+/** Shuffle estable por día (como seed diario de la app). */
+function pickDiscoverEpisodes(all: PodcastEpisode[], count = 10): PodcastEpisode[] {
   const valid = all.filter(
-    (ep) => ep.title.trim().length > 0 && ep.title !== 'Sin título'
+    (ep) => ep.title.trim().length > 0 && ep.title !== "Sin título"
   )
   const pool = valid.length > 0 ? valid : all
-  const shuffled = [...pool].sort(() => Math.random() - 0.5)
+  const daySeed = new Date().toISOString().slice(0, 10)
+  let hash = 0
+  for (let i = 0; i < daySeed.length; i++) {
+    hash = (hash * 31 + daySeed.charCodeAt(i)) >>> 0
+  }
+  const shuffled = [...pool]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    hash = (hash * 1664525 + 1013904223) >>> 0
+    const j = hash % (i + 1)
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
   return shuffled.slice(0, count)
+}
+
+function formatEpisodeDate(date?: string): string | undefined {
+  if (!date) return undefined
+  const d = new Date(`${date}T00:00:00`)
+  if (Number.isNaN(d.getTime())) return date
+  return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`
+}
+
+function listTitle(episode: PodcastEpisode): string {
+  return episode.rawTitle?.trim() || episode.title
 }
 
 export default function PodcastSection() {
@@ -65,7 +87,8 @@ export default function PodcastSection() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedEpisode, setSelectedEpisode] = useState<PodcastEpisode | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
   const [selectedSeason, setSelectedSeason] = useState<string>(DEFAULT_SEASON_LABEL)
   const [currentPage, setCurrentPage] = useState(1)
   const episodesPerPage = 20
@@ -75,10 +98,10 @@ export default function PodcastSection() {
     try {
       setError(null)
       setLoading(true)
-      const response = await fetch('/api/episodes')
+      const response = await fetch("/api/episodes")
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Error desconocido' }))
+        const errorData = await response.json().catch(() => ({ error: "Error desconocido" }))
         const errorMessage = errorData.error || errorData.details || `Error ${response.status}`
         throw new Error(errorMessage)
       }
@@ -86,14 +109,14 @@ export default function PodcastSection() {
       const data = await response.json()
       if (data.episodes && Array.isArray(data.episodes)) {
         setEpisodes(data.episodes)
-        setDiscoverEpisodes(pickDiscoverEpisodes(data.episodes))
+        setDiscoverEpisodes(pickDiscoverEpisodes(data.episodes, 10))
         setError(null)
       } else {
-        throw new Error('Formato de datos inválido')
+        throw new Error("Formato de datos inválido")
       }
     } catch (err) {
-      console.error('Error fetching episodes:', err)
-      setError(err instanceof Error ? err.message : 'Error al cargar los episodios.')
+      console.error("Error fetching episodes:", err)
+      setError(err instanceof Error ? err.message : "Error al cargar los episodios.")
     } finally {
       setLoading(false)
     }
@@ -103,17 +126,26 @@ export default function PodcastSection() {
     fetchEpisodes()
   }, [])
 
+  useEffect(() => {
+    setDescriptionExpanded(false)
+  }, [selectedEpisode?.id])
+
   const seasonNum = useMemo((): SeasonNumber => {
-    if (selectedSeason.includes('3')) return 3
-    if (selectedSeason.includes('1')) return 1
+    if (selectedSeason.includes("3")) return 3
+    if (selectedSeason.includes("1")) return 1
     return 2
   }, [selectedSeason])
 
   const searchFiltered = episodes.filter((episode) => {
     const searchNormalized = normalizeText(searchQuery)
-    const titleNormalized = normalizeText(episode.title)
-    const guestNormalized = episode.guest ? normalizeText(episode.guest) : ''
-    return titleNormalized.includes(searchNormalized) || guestNormalized.includes(searchNormalized)
+    const titleNormalized = normalizeText(listTitle(episode))
+    const guestNormalized = episode.guest ? normalizeText(episode.guest) : ""
+    const descNormalized = normalizeText(episode.description || "")
+    return (
+      titleNormalized.includes(searchNormalized) ||
+      guestNormalized.includes(searchNormalized) ||
+      descNormalized.includes(searchNormalized)
+    )
   })
 
   const bySeason = episodes.filter((ep) => (ep.season ?? 2) === seasonNum)
@@ -142,17 +174,17 @@ export default function PodcastSection() {
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setSelectedEpisode(null)
+      if (e.key === "Escape") setSelectedEpisode(null)
     }
     if (selectedEpisode) {
-      document.addEventListener('keydown', handleEscape)
-      document.body.style.overflow = 'hidden'
+      document.addEventListener("keydown", handleEscape)
+      document.body.style.overflow = "hidden"
     } else {
-      document.body.style.overflow = 'unset'
+      document.body.style.overflow = "unset"
     }
     return () => {
-      document.removeEventListener('keydown', handleEscape)
-      document.body.style.overflow = 'unset'
+      document.removeEventListener("keydown", handleEscape)
+      document.body.style.overflow = "unset"
     }
   }, [selectedEpisode])
 
@@ -165,7 +197,7 @@ export default function PodcastSection() {
     if (!searchQuery.trim()) return
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
     searchDebounceRef.current = setTimeout(() => {
-      analyticsEvents.search_performed(searchQuery, 'podcast', filteredEpisodes.length)
+      analyticsEvents.search_performed(searchQuery, "podcast", filteredEpisodes.length)
       searchDebounceRef.current = null
     }, 600)
     return () => {
@@ -177,7 +209,7 @@ export default function PodcastSection() {
   const startIndex = (currentPage - 1) * episodesPerPage
   const paginatedEpisodes = filteredEpisodes.slice(startIndex, startIndex + episodesPerPage)
 
-  const handleEpisodeClick = (episode: PodcastEpisode, source: 'discover' | 'list' = 'list') => {
+  const handleEpisodeClick = (episode: PodcastEpisode, source: "discover" | "list" = "list") => {
     setSelectedEpisode(episode)
     analyticsEvents.podcast_episode_viewed({
       episode_id: String(episode.id),
@@ -190,25 +222,63 @@ export default function PodcastSection() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
-    document.getElementById('podcast-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    document.getElementById("podcast-section")?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
+
+  const shareEpisode = async (episode: PodcastEpisode) => {
+    const guest = episode.guest?.trim()
+    const lines = [
+      `Descubre el episodio "${episode.title}"${guest ? ` con ${guest}` : ""}`,
+      "",
+      "Ver en YouTube:",
+      episode.youtubeUrl,
+    ]
+    const text = lines.join("\n")
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: episode.title, text, url: episode.youtubeUrl })
+      } else {
+        await navigator.clipboard.writeText(text)
+      }
+    } catch {
+      // Usuario canceló share; ignorar.
+    }
   }
 
   const videoId = selectedEpisode ? getYouTubeVideoId(selectedEpisode.youtubeUrl) : null
+  const description = selectedEpisode?.description?.trim() || "Sin descripción disponible."
+  const canExpandDescription = description.length > 220
 
   return (
-    <section id="podcast-section" className={`${SECTION_CONTAINER} space-y-12`}>
+    <section id="podcast-section" className={`${SECTION_CONTAINER} space-y-10 md:space-y-12`}>
       <SectionIntro>
-        Episodios en audio y video. Búsqueda por título o invitado, filtros por temporada, sección Descubre y reproductor en pantalla completa.
+        Episodios en audio y video. Búsqueda por título o invitado, filtros por temporada, sección
+        Descubre y reproductor en pantalla completa.
       </SectionIntro>
 
       <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}
-        placeholder="Buscar episodios por título o invitado..."
-        className="max-w-2xl"
+        placeholder="Buscar episodios, invitado o tema..."
+        className="max-w-3xl"
       />
 
-      {loading && <LoadingSkeleton count={6} variant="card" />}
+      {loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-3 p-2.5 rounded-2xl bg-[#0D0D0D] border border-primary/15 animate-pulse"
+            >
+              <div className="w-28 h-[72px] shrink-0 rounded-[10px] bg-zinc-800" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3.5 bg-zinc-800 rounded w-4/5" />
+                <div className="h-3 bg-zinc-800 rounded w-2/5" />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {error && !loading && (
         <ErrorState
@@ -223,31 +293,52 @@ export default function PodcastSection() {
           {!searchQuery.trim() && discoverEpisodes.length > 0 && (
             <div className="space-y-4">
               <SectionHeader title="Descubre" align="start" />
-              <AutoCarousel
-                label="Episodios para descubrir"
-                intervalMs={5000}
-                itemClassName="min-w-[240px] max-w-[260px] snap-start shrink-0"
-              >
+              {/* Mobile: carrusel */}
+              <div className="md:hidden">
+                <AutoCarousel
+                  label="Episodios para descubrir"
+                  intervalMs={5000}
+                  itemClassName="min-w-[240px] max-w-[260px] snap-start shrink-0"
+                >
+                  {discoverEpisodes.slice(0, 4).map((episode) => (
+                    <EpisodeCard
+                      key={`discover-m-${episode.id}`}
+                      compact
+                      title={episode.title}
+                      guest={episode.guest}
+                      duration={episode.duration}
+                      image={episode.thumbnail || "/placeholder.svg"}
+                      description={episode.description}
+                      onClick={() => handleEpisodeClick(episode, "discover")}
+                    />
+                  ))}
+                </AutoCarousel>
+              </div>
+              {/* Tablet/Desktop: grid como layout ancho de la app */}
+              <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {discoverEpisodes.map((episode) => (
                   <EpisodeCard
-                    key={`discover-${episode.id}`}
+                    key={`discover-d-${episode.id}`}
                     compact
                     title={episode.title}
                     guest={episode.guest}
                     duration={episode.duration}
                     image={episode.thumbnail || "/placeholder.svg"}
                     description={episode.description}
-                    episodeNumber={episode.id}
-                    onClick={() => handleEpisodeClick(episode, 'discover')}
+                    onClick={() => handleEpisodeClick(episode, "discover")}
                   />
                 ))}
-              </AutoCarousel>
+              </div>
             </div>
           )}
 
           <div className="space-y-4">
             <SectionHeader
-              title="Episodios"
+              title={
+                searchQuery.trim()
+                  ? `Resultados (${filteredEpisodes.length})`
+                  : "Episodios"
+              }
               align="start"
               trailing={
                 !searchQuery.trim() ? (
@@ -258,7 +349,7 @@ export default function PodcastSection() {
 
             {paginatedEpisodes.length > 0 ? (
               <>
-                <div className="flex flex-col gap-2.5 max-w-3xl">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                   {paginatedEpisodes.map((episode, index) => (
                     <motion.div
                       key={episode.id}
@@ -266,21 +357,22 @@ export default function PodcastSection() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: Math.min(index * 0.02, 0.3) }}
+                      className="h-full"
                     >
                       <EpisodeListTile
-                        title={episode.title}
+                        title={listTitle(episode)}
                         guest={episode.guest}
                         duration={episode.duration}
+                        date={formatEpisodeDate(episode.date)}
                         image={episode.thumbnail || "/placeholder.svg"}
-                        episodeNumber={episode.id}
-                        onClick={() => handleEpisodeClick(episode, 'list')}
+                        onClick={() => handleEpisodeClick(episode, "list")}
                       />
                     </motion.div>
                   ))}
                 </div>
 
                 {totalPages > 1 && (
-                  <div className="flex justify-start items-center gap-2 pt-6 max-w-3xl">
+                  <div className="flex justify-start items-center gap-2 pt-6">
                     <Button
                       variant="outline"
                       onClick={() => handlePageChange(currentPage - 1)}
@@ -342,7 +434,7 @@ export default function PodcastSection() {
                 }
                 subtitle={
                   searchQuery.trim()
-                    ? 'Prueba con otro título o invitado.'
+                    ? "Prueba con otro título o invitado."
                     : emptySeasonMessage(selectedSeason)
                 }
               />
@@ -353,46 +445,87 @@ export default function PodcastSection() {
 
       {selectedEpisode && videoId && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm overflow-y-auto"
           onClick={() => setSelectedEpisode(null)}
         >
           <div
-            className="relative w-full max-w-5xl bg-black rounded-2xl overflow-hidden shadow-2xl"
+            className="relative min-h-full w-full max-w-3xl mx-auto px-4 py-6 md:py-10"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={() => setSelectedEpisode(null)}
-              className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-black/70 hover:bg-black/90 rounded-full text-white transition-colors"
-              aria-label="Cerrar"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <div className="p-6 md:p-8 bg-zinc-900/50 border-b border-zinc-800">
-              {selectedEpisode.guest && (
-                <div className="text-sm md:text-base text-primary font-medium mb-2">
-                  {selectedEpisode.guest}
-                </div>
-              )}
-              <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
-                {selectedEpisode.title}
-              </h3>
-              {selectedEpisode.duration && (
-                <p className="text-white/70 text-sm md:text-base">
-                  Duración: {selectedEpisode.duration}
-                </p>
-              )}
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-white font-semibold text-sm md:text-base truncate pr-3">
+                {selectedEpisode.rawTitle?.split("||")[0]?.trim() || selectedEpisode.title}
+              </p>
+              <button
+                onClick={() => setSelectedEpisode(null)}
+                className="w-10 h-10 flex items-center justify-center rounded-[10px] bg-[#1A1A1A] text-white hover:bg-white/10 transition-colors shrink-0"
+                aria-label="Cerrar"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+
+            <div className="relative w-full overflow-hidden rounded-2xl bg-zinc-900 aspect-video">
               <iframe
-                className="absolute top-0 left-0 w-full h-full"
+                className="absolute inset-0 w-full h-full"
                 src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
                 title={selectedEpisode.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
             </div>
+
+            <div className="mt-4 space-y-3">
+              <h3 className="text-white font-bold text-xl leading-snug tracking-tight">
+                {selectedEpisode.title}
+              </h3>
+              {selectedEpisode.guest && (
+                <p className="text-primary font-semibold text-sm">{selectedEpisode.guest}</p>
+              )}
+              <div className="flex flex-wrap gap-2">
+                {selectedEpisode.date && (
+                  <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#0D0D0D] px-2.5 py-1.5 text-xs text-zinc-400">
+                    <Calendar className="w-3.5 h-3.5 text-primary" />
+                    {formatEpisodeDate(selectedEpisode.date)}
+                  </span>
+                )}
+                {selectedEpisode.duration && (
+                  <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#0D0D0D] px-2.5 py-1.5 text-xs text-zinc-400">
+                    <Clock className="w-3.5 h-3.5 text-primary" />
+                    {selectedEpisode.duration}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-5">
+              <h4 className="text-white font-bold text-[15px] tracking-tight mb-2">Descripción</h4>
+              <p
+                className={`text-[14px] leading-relaxed text-zinc-300/90 whitespace-pre-wrap ${
+                  descriptionExpanded || !canExpandDescription ? "" : "line-clamp-5"
+                }`}
+              >
+                {description}
+              </p>
+              {canExpandDescription && (
+                <button
+                  type="button"
+                  onClick={() => setDescriptionExpanded((v) => !v)}
+                  className="mt-1.5 text-primary text-[13px] font-semibold"
+                >
+                  {descriptionExpanded ? "Ver menos" : "Ver más"}
+                </button>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => shareEpisode(selectedEpisode)}
+              className="mt-6 w-full h-12 inline-flex items-center justify-center gap-2 rounded-xl border border-primary/45 bg-primary/10 text-primary text-[15px] font-semibold hover:bg-primary/15 transition-colors"
+            >
+              <Share2 className="w-[18px] h-[18px]" />
+              Compartir episodio
+            </button>
           </div>
         </div>
       )}

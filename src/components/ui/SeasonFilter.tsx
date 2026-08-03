@@ -21,7 +21,7 @@ export function SeasonFilter({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className={`bg-card-bg border border-white/10 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer min-w-[180px] ${className}`}
+      className={`h-10 bg-[#0D0D0D] border border-primary/40 text-white text-sm rounded-xl px-3 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary cursor-pointer min-w-[160px] ${className}`}
       aria-label={ariaLabel}
     >
       {seasons.map((opt) => (
