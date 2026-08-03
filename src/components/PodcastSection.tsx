@@ -354,7 +354,7 @@ export default function PodcastSection() {
                 </div>
 
                 {totalPages > 1 && (
-                  <div className="flex justify-start items-center gap-2 pt-6">
+                  <div className="flex justify-center items-center gap-2 pt-6">
                     <Button
                       variant="outline"
                       onClick={() => handlePageChange(currentPage - 1)}

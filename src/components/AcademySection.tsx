@@ -165,10 +165,7 @@ export default function AcademySection() {
 
         {!loading && !error && courses.length > 0 && (
           <>
-            <div className="mb-6">
-              <SectionHeader title="Cursos" align="start" />
-            </div>
-            <div className="flex flex-wrap gap-2 justify-start mb-8">
+            <div className="flex w-full flex-wrap items-center justify-start gap-2 mb-6">
               <div className="relative inline-flex items-center">
                 <select
                   value={filterPath}
@@ -180,13 +177,13 @@ export default function AcademySection() {
                       analyticsEvents.filter_applied('learning_path', v, 'academy');
                     }
                   }}
-                  className={`appearance-none border rounded-xl pl-4 pr-10 py-2 text-sm font-medium transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none cursor-pointer ${
+                  className={`appearance-none h-10 border rounded-xl pl-4 pr-10 text-sm font-semibold transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none cursor-pointer ${
                     filterPath
                       ? 'bg-primary/15 text-primary border-primary/70'
-                      : 'bg-card-bg text-zinc-400 border-primary/15 hover:border-primary/40 hover:text-white'
+                      : 'bg-card-bg text-white border-primary/20 hover:border-primary/40'
                   }`}
                 >
-                  <option value="">Ruta de aprendizaje</option>
+                  <option value="">Ruta</option>
                   {learningPaths.map((p) => (
                     <option key={p} value={p}>
                       {learningPathLabel(p)}
@@ -205,10 +202,10 @@ export default function AcademySection() {
                       analyticsEvents.filter_applied('difficulty', v, 'academy');
                     }
                   }}
-                  className={`appearance-none border rounded-xl pl-4 pr-10 py-2 text-sm font-medium transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none cursor-pointer ${
+                  className={`appearance-none h-10 border rounded-xl pl-4 pr-10 text-sm font-semibold transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none cursor-pointer ${
                     filterDifficulty
                       ? 'bg-primary/15 text-primary border-primary/70'
-                      : 'bg-card-bg text-zinc-400 border-primary/15 hover:border-primary/40 hover:text-white'
+                      : 'bg-card-bg text-white border-primary/20 hover:border-primary/40'
                   }`}
                 >
                   <option value="">Dificultad</option>
@@ -228,11 +225,22 @@ export default function AcademySection() {
                     setFilterDifficulty('');
                     setSearch('');
                   }}
-                  className="rounded-xl px-4 py-2 text-sm font-medium bg-card-bg text-zinc-400 border border-primary/15 hover:border-primary/40 hover:text-white transition-all"
+                  className="h-10 rounded-xl px-4 text-sm font-semibold bg-card-bg text-primary border border-primary/35 hover:border-primary/60 hover:bg-primary/10 transition-all"
                 >
                   Limpiar
                 </Button>
               )}
+            </div>
+            <div className="mb-6">
+              <SectionHeader
+                title="Cursos"
+                align="start"
+                trailing={
+                  <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/15 px-2.5 py-1 text-xs font-bold text-primary">
+                    {filtered.length}
+                  </span>
+                }
+              />
             </div>
 
             {filtered.length === 0 ? (
