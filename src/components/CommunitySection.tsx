@@ -7,7 +7,8 @@ import { analyticsEvents } from '@/lib/analytics';
 import { EventCard, type EventCardData, formatEventDate } from '@/components/EventCard';
 import { SectionIntro } from '@/components/ui/SectionIntro';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { Button } from '@/components/ui/button';
+import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton';
+import { ErrorState } from '@/components/ui/ErrorState';
 import { SECTION_CONTAINER } from '@/lib/section-layout';
 import { motion } from 'framer-motion';
 
@@ -96,49 +97,11 @@ export default function CommunitySection() {
         Eventos presenciales y virtuales para la comunidad tech. Meetups, charlas y workshops organizados por DevLokos.
       </SectionIntro>
       {loading && (
-          <div className="space-y-12">
-            <div>
-              <div className="h-7 w-28 bg-zinc-800 rounded mb-6 animate-pulse" />
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className="flex flex-col rounded-xl overflow-hidden bg-[#0A0A0A] border border-white/5 animate-pulse">
-                    <div className="w-full h-28 bg-[#F97316]/20" />
-                    <div className="p-3 space-y-2">
-                      <div className="h-4 bg-zinc-800 rounded w-full" />
-                      <div className="h-3 bg-zinc-800 rounded w-24" />
-                      <div className="h-3 bg-zinc-800 rounded w-5/6" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <div className="h-7 w-24 bg-zinc-800 rounded mb-6 animate-pulse" />
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="flex flex-col rounded-xl overflow-hidden bg-[#0A0A0A] border border-white/5 animate-pulse">
-                    <div className="w-full h-28 bg-[#F97316]/20" />
-                    <div className="p-3 space-y-2">
-                      <div className="h-4 bg-zinc-800 rounded w-full" />
-                      <div className="h-3 bg-zinc-800 rounded w-24" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <LoadingSkeleton count={8} variant="event" className="grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" />
         )}
 
         {error && !loading && (
-          <EmptyState
-            title="Algo salió mal"
-            subtitle={error}
-            action={
-              <Button onClick={fetchEvents} className="bg-primary hover:bg-primary/90 text-white">
-                Reintentar
-              </Button>
-            }
-          />
+          <ErrorState title="Algo salió mal" message={error} onRetry={fetchEvents} />
         )}
 
         {!loading && !error && !hasEvents && (
@@ -219,7 +182,6 @@ export default function CommunitySection() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 512px) 100vw, 512px"
-                    unoptimized
                   />
                 </div>
               )}

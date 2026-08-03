@@ -181,9 +181,9 @@ Cada página importa su sección dentro de `SECTION_PAGE_WRAPPER` ([`src/lib/sec
 
 ---
 
-## Componente legacy
+## Legacy eliminado (Fase 1)
 
-**`HeroSection.tsx`** — Existe en el repositorio pero **no se importa en ninguna página**. Era parte de la landing original de una sola pantalla. Puede eliminarse o reutilizarse si se redefine la home.
+**`HeroSection.tsx`** — Eliminado: no se usaba. La home renderiza `PodcastSection` directamente.
 
 ---
 
@@ -247,7 +247,6 @@ src/
 │   ├── AcademySection.tsx
 │   ├── EnterpriseSection.tsx
 │   ├── CommunitySection.tsx
-│   ├── HeroSection.tsx     # LEGACY — no usado
 │   ├── EpisodeCard.tsx
 │   ├── TutorialCard.tsx
 │   ├── CourseCard.tsx

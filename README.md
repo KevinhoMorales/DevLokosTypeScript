@@ -233,11 +233,21 @@ Resumen:
 
 ---
 
+## Administración (CMS)
+
+Panel en **`/admin`** (no aparece en la NavBar pública).
+
+1. Configura `NEXT_PUBLIC_FIREBASE_*` y `FIREBASE_ADMIN_SDK_KEY`
+2. Registra el email admin en Firestore (`prod/prod/admin`) — ver [ADMIN_SETUP en la app](https://github.com/KevinhoMorales/DevLokosDart/blob/main/ADMIN_SETUP.md)
+3. Entra a `/admin/login` con email/password de Firebase Auth
+4. Gestiona: **Cursos**, **Eventos**, **Servicios**, **Portfolio**
+
+APIs protegidas con Bearer ID token + verificación de email admin.
+
 ## Pendientes conocidos
 
 - Assets `logo.png`, `logo-transparent.png`, `favicon.png` referenciados pero no incluidos en `public/` del repo
 - `robots.txt` apunta a `sitemap.xml` — pendiente implementar `src/app/sitemap.ts`
-- `HeroSection.tsx` existe pero no se usa en ninguna ruta (legacy)
 - Sin suite de tests automatizados (solo `npm run lint`)
 - Sin CI/CD
 
@@ -249,4 +259,6 @@ Proyecto privado y propietario.
 
 **Mantenido por:** DevLokos Team
 
-**Última actualización:** Junio 2026
+Auditoría de producto (ecosistema App + Web): ver [`../AUDITORIA_PRODUCTO.md`](../AUDITORIA_PRODUCTO.md).
+
+**Última actualización:** Agosto 2026

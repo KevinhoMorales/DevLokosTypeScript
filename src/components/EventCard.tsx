@@ -56,7 +56,6 @@ export function EventCard({ event, onShare, onClick, onRegisterClick }: EventCar
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 50vw"
-            unoptimized
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-zinc-600">

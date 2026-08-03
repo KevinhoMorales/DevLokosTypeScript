@@ -43,7 +43,6 @@ export function TutorialCard({ title, thumbnailUrl, publishedAt, onClick }: Tuto
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, 33vw"
-            unoptimized
           />
         ) : null}
         <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/30 transition-colors">

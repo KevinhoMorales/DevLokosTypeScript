@@ -2,11 +2,9 @@ import type { Metadata } from "next";
 import type React from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import NavBar from "@/components/NavBar";
-import Footer from "@/components/Footer";
-import { AnalyticsProvider } from "@/components/AnalyticsProvider";
+import { SiteChrome } from "@/components/SiteChrome";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://devlokos.com'),
@@ -65,13 +63,9 @@ export default function RootLayout({
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
       </head>
-      <body className={inter.className}>
-        <div className="min-h-screen bg-black text-white selection:bg-orange-500/30 flex flex-col">
-          <AnalyticsProvider>
-            <NavBar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </AnalyticsProvider>
+      <body className={`${inter.variable} ${inter.className}`}>
+        <div className="min-h-screen bg-black text-white selection:bg-primary/30 flex flex-col">
+          <SiteChrome>{children}</SiteChrome>
         </div>
       </body>
     </html>

@@ -12,9 +12,9 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        primary: "#ff914d",
+        primary: "#FF914D",
         orange: {
-          500: "#F97316",
+          500: "#FF914D",
         },
         secondary: {
           black: "#000000",
@@ -22,11 +22,13 @@ const config: Config = {
         },
         "background-light": "#f5f7f8",
         "background-dark": "#000000",
-        "card-bg": "#182634",
+        "card-bg": "#1A1A1A",
+        surface: "#1A1A1A",
+        muted: "#9E9E9E",
       },
       fontFamily: {
-        display: ["var(--font-eudoxus-sans)", "sans-serif"],
-        sans: ["var(--font-eudoxus-sans)", "sans-serif"],
+        display: ["var(--font-inter)", "Inter", "sans-serif"],
+        sans: ["var(--font-inter)", "Inter", "sans-serif"],
       },
       borderRadius: {
         DEFAULT: "0.5rem",

@@ -399,7 +399,6 @@ export default function EnterpriseSection() {
                         fill
                         className="object-cover"
                         sizes="280px"
-                        unoptimized
                       />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center text-zinc-600">

@@ -7,6 +7,8 @@ import { analyticsEvents } from '@/lib/analytics';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionIntro } from '@/components/ui/SectionIntro';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton';
+import { ErrorState } from '@/components/ui/ErrorState';
 import { CourseCard, type CourseCardData } from '@/components/CourseCard';
 import { SECTION_CONTAINER } from '@/lib/section-layout';
 import { Button } from '@/components/ui/button';
@@ -128,41 +130,21 @@ export default function AcademySection() {
       </SectionIntro>
       <SearchBar value={search} onChange={setSearch} placeholder="Buscar cursos..." className="mb-6" />
 
-        {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="flex flex-col rounded-2xl overflow-hidden bg-[#0A0A0A] border border-white/5 animate-pulse">
-                <div className="w-full h-[120px] bg-[#F97316]/20" />
-                <div className="p-4 space-y-3">
-                  <div className="h-4 bg-zinc-800 rounded w-20" />
-                  <div className="h-5 bg-zinc-800 rounded w-full" />
-                  <div className="h-4 bg-zinc-800 rounded w-5/6" />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        {loading && <LoadingSkeleton count={8} variant="card" className="sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" />}
 
         {error && !loading && (
-          <EmptyState
+          <ErrorState
             title="Error al cargar cursos"
-            subtitle={error}
-            action={
-              <Button
-                onClick={() => {
-                  setLoading(true);
-                  setError(null);
-                  fetch('/api/courses')
-                    .then((r) => r.json())
-                    .then((d) => (d.error ? Promise.reject(new Error(d.error)) : setCourses(d.courses ?? [])))
-                    .catch((e) => setError(e.message))
-                    .finally(() => setLoading(false));
-                }}
-                className="bg-primary hover:bg-primary/90 text-white"
-              >
-                Reintentar
-              </Button>
-            }
+            message={error}
+            onRetry={() => {
+              setLoading(true);
+              setError(null);
+              fetch('/api/courses')
+                .then((r) => r.json())
+                .then((d) => (d.error ? Promise.reject(new Error(d.error)) : setCourses(d.courses ?? [])))
+                .catch((e) => setError(e.message))
+                .finally(() => setLoading(false));
+            }}
           />
         )}
 
@@ -303,7 +285,6 @@ export default function AcademySection() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 672px) 100vw, 672px"
-                    unoptimized
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-transparent to-transparent opacity-80" />
                 </div>

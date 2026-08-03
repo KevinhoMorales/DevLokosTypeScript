@@ -17,6 +17,16 @@ export function getCoursesRef(db: admin.firestore.Firestore) {
   return db.collection(FIREBASE_ENV).doc(FIREBASE_ENV).collection('courses');
 }
 
+/** Colección raíz services (Empresarial). */
+export function getServicesRef(db: admin.firestore.Firestore) {
+  return db.collection('services');
+}
+
+/** Colección raíz portfolio (Empresarial). */
+export function getPortfolioRef(db: admin.firestore.Firestore) {
+  return db.collection('portfolio');
+}
+
 /**
  * Convierte un valor de Firestore (Timestamp o lo que sea) a Date o valor original.
  */
@@ -70,10 +80,42 @@ export function parseCourseDoc(id: string, data: Record<string, unknown>) {
     learningObjectives: (data.learningObjectives as string[]) ?? [],
     professor: data.professor as string | undefined,
     link: data.link as string | undefined,
-    isPublished: data.isPublished as boolean,
+    isPublished: Boolean(data.isPublished),
+    isPaid: Boolean(data.isPaid),
+    price: typeof data.price === 'number' ? data.price : null,
+    enrollmentCount: typeof data.enrollmentCount === 'number' ? data.enrollmentCount : 0,
     createdAt: createdAt instanceof Date ? createdAt : new Date(),
     updatedAt: updatedAt instanceof Date ? updatedAt : new Date(),
     publishedAt: publishedAt instanceof Date ? publishedAt : null,
+  };
+}
+
+export function parseServiceDoc(id: string, data: Record<string, unknown>) {
+  return {
+    id,
+    title: (data.title as string) ?? '',
+    description: (data.description as string) ?? '',
+    icon: (data.icon as string) ?? '💼',
+    features: (data.features as string[]) ?? [],
+    order: typeof data.order === 'number' ? data.order : 0,
+    isPublished: data.isPublished !== false,
+  };
+}
+
+export function parsePortfolioDoc(id: string, data: Record<string, unknown>) {
+  const createdAt = parseTimestamp(data.createdAt);
+  return {
+    id,
+    title: (data.title as string) ?? '',
+    description: (data.description as string) ?? '',
+    thumbnailUrl: data.thumbnailUrl as string | undefined,
+    technologies: (data.technologies as string[]) ?? [],
+    category: (data.category as string) ?? '',
+    projectUrl: data.projectUrl as string | undefined,
+    caseStudyUrl: data.caseStudyUrl as string | undefined,
+    isPublished: data.isPublished !== false,
+    order: typeof data.order === 'number' ? data.order : 0,
+    createdAt: createdAt instanceof Date ? createdAt.toISOString() : new Date().toISOString(),
   };
 }
 

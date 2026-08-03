@@ -180,8 +180,18 @@ export async function getRemoteConfigValue(paramName: string): Promise<string | 
   }
 }
 
-/** Firestore instance for server-side reads. Sin FIREBASE_ADMIN_SDK_KEY las lecturas fallarán con error de permisos. */
+/** Firestore instance for server-side reads/writes. Sin FIREBASE_ADMIN_SDK_KEY fallará con error de permisos. */
 export function getFirestore() {
   return admin.firestore(getAdminApp());
+}
+
+/** Firebase Storage (Admin) para uploads del CMS. */
+export function getStorageBucket() {
+  const app = getAdminApp();
+  const bucketName =
+    process.env.FIREBASE_STORAGE_BUCKET ||
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+    `${process.env.FIREBASE_PROJECT_ID || 'devlokos'}.firebasestorage.app`;
+  return admin.storage(app).bucket(bucketName);
 }
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getYouTubeApiKeyFromRemoteConfig } from '@/lib/firebase-admin';
 import { getYouTubePlaylistVideos } from '@/lib/youtube';
+import { detectSeasonFromTitle, type SeasonNumber } from '@/lib/podcast-seasons';
 
 interface PodcastEpisode {
   id: number;
@@ -13,8 +14,8 @@ interface PodcastEpisode {
   guest?: string;
   quote?: string;
   date?: string;
-  /** 1 o 2 según si el título del video en YouTube contiene "S1" o "S2" (por defecto 2). */
-  season: 1 | 2;
+  /** 1 | 2 | 3 según S1/S2/S3 en el título (por defecto 2). */
+  season: SeasonNumber;
 }
 
 const YOUTUBE_PLAYLIST_ID = 'PLPXi7Vgl6Ak-Bm8Y2Xxhp1dwrzWT3AbjZ';
@@ -43,18 +44,12 @@ export async function GET() {
       youtubeApiKey
     );
 
-    // Determinar temporada por título del video (S1 / S2); por defecto Temporada 2
-    const seasonFromTitle = (rawTitle: string): 1 | 2 =>
-      rawTitle.includes('S2') ? 2 : rawTitle.includes('S1') ? 1 : 2;
-
-    // Convertir los videos de YouTube al formato de episodios
     const episodes: PodcastEpisode[] = youtubeVideos.map((video, index) => {
-      // Extraer información del título (formato: "DevLokos S2 Ep078 || Título || Invitado")
+      // Formato: "DevLokos S2 Ep078 || Título || Invitado"
       const titleParts = video.title.split('||').map(part => part.trim());
       const episodeTitle = titleParts.length > 1 ? titleParts[1] : video.title;
       const guest = titleParts.length > 2 ? titleParts[2] : undefined;
 
-      // Extraer descripción (primeros 200 caracteres)
       const description = video.description.length > 200 
         ? video.description.substring(0, 200) + '...'
         : video.description;
@@ -68,8 +63,8 @@ export async function GET() {
         youtubeUrl: `https://www.youtube.com/watch?v=${video.videoId}`,
         duration: video.duration,
         guest: guest,
-        date: video.publishedAt.split('T')[0], // Solo la fecha sin la hora
-        season: seasonFromTitle(video.title),
+        date: video.publishedAt.split('T')[0],
+        season: detectSeasonFromTitle(video.title),
       };
     });
 

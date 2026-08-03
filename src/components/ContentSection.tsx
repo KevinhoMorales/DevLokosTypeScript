@@ -6,6 +6,8 @@ import { analyticsEvents } from '@/lib/analytics';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionIntro } from '@/components/ui/SectionIntro';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton';
+import { ErrorState } from '@/components/ui/ErrorState';
 import { TutorialCard } from '@/components/TutorialCard';
 import { Button } from '@/components/ui/button';
 import { SECTION_CONTAINER } from '@/lib/section-layout';
@@ -142,37 +144,14 @@ export default function ContentSection() {
         Contenido práctico organizado por playlists. Aprende nuevas tecnologías con tutoriales enfocados en ejemplos reales y casos de uso.
       </SectionIntro>
       {loadingPlaylists && (
-          <div className="space-y-8">
-            <div className="h-12 max-w-2xl mx-auto rounded-2xl bg-[#0A0A0A] border border-white/5 animate-pulse" />
-            <div className="flex flex-wrap gap-2 justify-center">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-10 w-32 rounded-full bg-[#0A0A0A] border border-white/5 animate-pulse" />
-              ))}
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="flex flex-col rounded-2xl overflow-hidden bg-[#0A0A0A] border border-white/5 animate-pulse">
-                  <div className="w-full aspect-video bg-[#F97316]/20" />
-                  <div className="p-4 space-y-3">
-                    <div className="h-4 bg-zinc-800 rounded w-24" />
-                    <div className="h-5 bg-zinc-800 rounded w-full" />
-                    <div className="h-4 bg-zinc-800 rounded w-5/6" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <LoadingSkeleton count={6} variant="video" />
         )}
 
         {errorPlaylists && !loadingPlaylists && playlists.length === 0 && (
-          <EmptyState
+          <ErrorState
             title={errorPlaylists.includes('.env') || errorPlaylists.includes('YOUTUBE') ? 'Configuración necesaria' : 'Error al cargar playlists'}
-            subtitle={errorPlaylists}
-            action={
-              <Button onClick={fetchPlaylists} className="bg-primary hover:bg-primary/90 text-white">
-                Reintentar
-              </Button>
-            }
+            message={errorPlaylists}
+            onRetry={fetchPlaylists}
           />
         )}
 
@@ -215,7 +194,7 @@ export default function ContentSection() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="flex flex-col rounded-2xl overflow-hidden bg-[#0A0A0A] border border-white/5 animate-pulse">
-                    <div className="w-full aspect-video bg-[#F97316]/20" />
+                    <div className="w-full aspect-video bg-[var(--primary)]/20" />
                     <div className="p-4 space-y-3">
                       <div className="h-4 bg-zinc-800 rounded w-24" />
                       <div className="h-5 bg-zinc-800 rounded w-full" />
