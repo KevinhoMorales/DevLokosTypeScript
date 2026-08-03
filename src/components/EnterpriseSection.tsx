@@ -499,16 +499,12 @@ function PortfolioGrid({
         <SectionHeader
           title="Portafolio"
           align="start"
-          className="mb-1"
           trailing={
             <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/15 px-2.5 py-1 text-xs font-bold text-primary">
               {items.length}
             </span>
           }
         />
-        <p className="text-zinc-500 text-sm md:text-base">
-          Proyectos reales — desliza o déjalos pasar solos.
-        </p>
       </div>
 
       <div className="flex flex-wrap gap-2 mb-5 md:mb-6">
