@@ -172,7 +172,7 @@ export default function ContentSection() {
               placeholder="Buscar por título..."
               className="mb-6 max-w-2xl"
             />
-            <div className="flex flex-wrap gap-2 justify-center mb-8">
+            <div className="flex flex-wrap gap-2 justify-start mb-8">
               {playlists.map((p) => (
                 <button
                   key={p.id}
@@ -195,7 +195,7 @@ export default function ContentSection() {
               <div className="mb-6">
                 <SectionHeader
                   title={selectedPlaylist.title}
-                  align="center"
+                  align="start"
                   trailing={
                     <span className="text-zinc-500 text-sm font-semibold">
                       {filteredTutorials.length}

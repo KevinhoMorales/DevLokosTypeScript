@@ -293,32 +293,14 @@ export default function PodcastSection() {
           {!searchQuery.trim() && discoverEpisodes.length > 0 && (
             <div className="space-y-4">
               <SectionHeader title="Descubre" align="start" />
-              {/* Mobile: carrusel */}
-              <div className="md:hidden">
-                <AutoCarousel
-                  label="Episodios para descubrir"
-                  intervalMs={5000}
-                  itemClassName="min-w-[240px] max-w-[260px] snap-start shrink-0"
-                >
-                  {discoverEpisodes.slice(0, 4).map((episode) => (
-                    <EpisodeCard
-                      key={`discover-m-${episode.id}`}
-                      compact
-                      title={episode.title}
-                      guest={episode.guest}
-                      duration={episode.duration}
-                      image={episode.thumbnail || "/placeholder.svg"}
-                      description={episode.description}
-                      onClick={() => handleEpisodeClick(episode, "discover")}
-                    />
-                  ))}
-                </AutoCarousel>
-              </div>
-              {/* Tablet/Desktop: grid como layout ancho de la app */}
-              <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <AutoCarousel
+                label="Episodios para descubrir"
+                intervalMs={5000}
+                itemClassName="min-w-[240px] max-w-[260px] md:min-w-[260px] md:max-w-[280px] lg:min-w-[280px] lg:max-w-[300px] snap-start shrink-0"
+              >
                 {discoverEpisodes.map((episode) => (
                   <EpisodeCard
-                    key={`discover-d-${episode.id}`}
+                    key={`discover-${episode.id}`}
                     compact
                     title={episode.title}
                     guest={episode.guest}
@@ -328,7 +310,7 @@ export default function PodcastSection() {
                     onClick={() => handleEpisodeClick(episode, "discover")}
                   />
                 ))}
-              </div>
+              </AutoCarousel>
             </div>
           )}
 
@@ -449,10 +431,10 @@ export default function PodcastSection() {
           onClick={() => setSelectedEpisode(null)}
         >
           <div
-            className="relative min-h-full w-full max-w-3xl mx-auto px-4 py-6 md:py-10"
+            className="relative min-h-full w-full max-w-3xl lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8 lg:py-10"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 lg:mb-5">
               <p className="text-white font-semibold text-sm md:text-base truncate pr-3">
                 {selectedEpisode.rawTitle?.split("||")[0]?.trim() || selectedEpisode.title}
               </p>
@@ -465,67 +447,78 @@ export default function PodcastSection() {
               </button>
             </div>
 
-            <div className="relative w-full overflow-hidden rounded-2xl bg-zinc-900 aspect-video">
-              <iframe
-                className="absolute inset-0 w-full h-full"
-                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
-                title={selectedEpisode.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-
-            <div className="mt-4 space-y-3">
-              <h3 className="text-white font-bold text-xl leading-snug tracking-tight">
-                {selectedEpisode.title}
-              </h3>
-              {selectedEpisode.guest && (
-                <p className="text-primary font-semibold text-sm">{selectedEpisode.guest}</p>
-              )}
-              <div className="flex flex-wrap gap-2">
-                {selectedEpisode.date && (
-                  <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#0D0D0D] px-2.5 py-1.5 text-xs text-zinc-400">
-                    <Calendar className="w-3.5 h-3.5 text-primary" />
-                    {formatEpisodeDate(selectedEpisode.date)}
-                  </span>
-                )}
-                {selectedEpisode.duration && (
-                  <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#0D0D0D] px-2.5 py-1.5 text-xs text-zinc-400">
-                    <Clock className="w-3.5 h-3.5 text-primary" />
-                    {selectedEpisode.duration}
-                  </span>
-                )}
+            {/* Mobile/tablet portrait: stack · Desktop/iPad landscape: video + panel */}
+            <div className="flex flex-col lg:flex-row lg:items-start lg:gap-8">
+              <div className="relative w-full lg:w-[58%] xl:w-[62%] shrink-0 overflow-hidden rounded-2xl bg-zinc-900 aspect-video">
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
+                  title={selectedEpisode.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
               </div>
-            </div>
 
-            <div className="mt-5">
-              <h4 className="text-white font-bold text-[15px] tracking-tight mb-2">Descripción</h4>
-              <p
-                className={`text-[14px] leading-relaxed text-zinc-300/90 whitespace-pre-wrap ${
-                  descriptionExpanded || !canExpandDescription ? "" : "line-clamp-5"
-                }`}
-              >
-                {description}
-              </p>
-              {canExpandDescription && (
+              <div className="mt-4 lg:mt-0 lg:flex-1 lg:min-w-0 lg:max-h-[min(70vh,640px)] lg:overflow-y-auto lg:pr-1">
+                <div className="space-y-3">
+                  <h3 className="text-white font-bold text-xl lg:text-2xl leading-snug tracking-tight">
+                    {selectedEpisode.title}
+                  </h3>
+                  {selectedEpisode.guest && (
+                    <p className="text-primary font-semibold text-sm lg:text-[15px]">
+                      {selectedEpisode.guest}
+                    </p>
+                  )}
+                  <div className="flex flex-wrap gap-2">
+                    {selectedEpisode.date && (
+                      <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#0D0D0D] px-2.5 py-1.5 text-xs text-zinc-400">
+                        <Calendar className="w-3.5 h-3.5 text-primary" />
+                        {formatEpisodeDate(selectedEpisode.date)}
+                      </span>
+                    )}
+                    {selectedEpisode.duration && (
+                      <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#0D0D0D] px-2.5 py-1.5 text-xs text-zinc-400">
+                        <Clock className="w-3.5 h-3.5 text-primary" />
+                        {selectedEpisode.duration}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-5">
+                  <h4 className="text-white font-bold text-[15px] tracking-tight mb-2">
+                    Descripción
+                  </h4>
+                  <p
+                    className={`text-[14px] leading-relaxed text-zinc-300/90 whitespace-pre-wrap ${
+                      descriptionExpanded || !canExpandDescription
+                        ? ""
+                        : "line-clamp-5 lg:line-clamp-[12]"
+                    }`}
+                  >
+                    {description}
+                  </p>
+                  {canExpandDescription && (
+                    <button
+                      type="button"
+                      onClick={() => setDescriptionExpanded((v) => !v)}
+                      className="mt-1.5 text-primary text-[13px] font-semibold"
+                    >
+                      {descriptionExpanded ? "Ver menos" : "Ver más"}
+                    </button>
+                  )}
+                </div>
+
                 <button
                   type="button"
-                  onClick={() => setDescriptionExpanded((v) => !v)}
-                  className="mt-1.5 text-primary text-[13px] font-semibold"
+                  onClick={() => shareEpisode(selectedEpisode)}
+                  className="mt-6 w-full h-12 inline-flex items-center justify-center gap-2 rounded-xl border border-primary/45 bg-primary/10 text-primary text-[15px] font-semibold hover:bg-primary/15 transition-colors"
                 >
-                  {descriptionExpanded ? "Ver menos" : "Ver más"}
+                  <Share2 className="w-[18px] h-[18px]" />
+                  Compartir episodio
                 </button>
-              )}
+              </div>
             </div>
-
-            <button
-              type="button"
-              onClick={() => shareEpisode(selectedEpisode)}
-              className="mt-6 w-full h-12 inline-flex items-center justify-center gap-2 rounded-xl border border-primary/45 bg-primary/10 text-primary text-[15px] font-semibold hover:bg-primary/15 transition-colors"
-            >
-              <Share2 className="w-[18px] h-[18px]" />
-              Compartir episodio
-            </button>
           </div>
         </div>
       )}

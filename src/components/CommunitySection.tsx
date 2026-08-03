@@ -117,7 +117,7 @@ export default function CommunitySection() {
           <div className="space-y-12">
             {upcoming.length > 0 && (
               <div>
-                <SectionHeader title="Próximos" align="center" className="mb-6" />
+                <SectionHeader title="Próximos" align="start" className="mb-6" />
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {upcoming.map((event, i) => (
                     <motion.div
@@ -135,7 +135,7 @@ export default function CommunitySection() {
 
             {past.length > 0 && (
               <div>
-                <SectionHeader title="Pasados" align="center" className="mb-6" />
+                <SectionHeader title="Pasados" align="start" className="mb-6" />
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {past.map((event, i) => (
                     <motion.div

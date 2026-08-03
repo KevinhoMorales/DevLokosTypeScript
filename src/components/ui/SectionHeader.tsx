@@ -6,7 +6,7 @@ interface SectionHeaderProps {
   title: string;
   trailing?: ReactNode;
   className?: string;
-  /** Default center for public pages */
+  /** Default start — misma alineación que la app (barra naranja a la izquierda). */
   align?: 'start' | 'center';
 }
 
@@ -14,7 +14,7 @@ export function SectionHeader({
   title,
   trailing,
   className = '',
-  align = 'center',
+  align = 'start',
 }: SectionHeaderProps) {
   if (align === 'center') {
     return (

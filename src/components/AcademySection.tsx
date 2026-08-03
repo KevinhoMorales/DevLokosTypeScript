@@ -174,9 +174,9 @@ export default function AcademySection() {
         {!loading && !error && courses.length > 0 && (
           <>
             <div className="mb-6">
-              <SectionHeader title="Cursos" align="center" />
+              <SectionHeader title="Cursos" align="start" />
             </div>
-            <div className="flex flex-wrap gap-2 justify-center mb-8">
+            <div className="flex flex-wrap gap-2 justify-start mb-8">
               <div className="relative inline-flex items-center">
                 <select
                   value={filterPath}

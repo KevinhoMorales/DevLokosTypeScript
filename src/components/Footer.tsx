@@ -1,18 +1,13 @@
-'use client';
-
 import type React from "react"
-import { useState } from 'react';
-import Link from 'next/link';
+import Link from "next/link"
 import { Instagram, Linkedin, Mail, Music2, Youtube } from "lucide-react"
 import { Logo } from "@/components/Logo"
-import PrivacyPolicyModal from './PrivacyPolicyModal';
-import TermsModal from './TermsModal';
 
 function SocialLink({ href, icon }: { href: string; icon: React.ReactNode }) {
   return (
-    <a 
-      href={href} 
-      target="_blank" 
+    <a
+      href={href}
+      target="_blank"
       rel="noopener noreferrer"
       className="text-zinc-400 hover:text-white hover:scale-110 transition-all duration-200"
     >
@@ -22,9 +17,6 @@ function SocialLink({ href, icon }: { href: string; icon: React.ReactNode }) {
 }
 
 export default function Footer() {
-  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
-  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
-  
   return (
     <footer className="w-full bg-black border-t border-white/10 py-12">
       <div className="container mx-auto px-4">
@@ -33,19 +25,13 @@ export default function Footer() {
             <Logo />
             <p className="text-zinc-500 text-sm">© {new Date().getFullYear()} DevLokos</p>
             <div className="flex flex-wrap justify-center md:justify-start gap-4 text-xs text-zinc-500">
-              <button 
-                onClick={() => setIsTermsModalOpen(true)}
-                className="hover:text-white transition-colors cursor-pointer"
-              >
+              <Link href="/terminos" className="hover:text-white transition-colors">
                 Términos de Servicio
-              </button>
+              </Link>
               <span className="text-zinc-700">|</span>
-              <button 
-                onClick={() => setIsPrivacyModalOpen(true)}
-                className="hover:text-white transition-colors cursor-pointer"
-              >
+              <Link href="/privacidad" className="hover:text-white transition-colors">
                 Política de Privacidad
-              </button>
+              </Link>
             </div>
           </div>
 
@@ -56,11 +42,26 @@ export default function Footer() {
             </p>
 
             <div className="flex flex-wrap justify-center md:justify-end gap-4">
-              <SocialLink href="https://youtube.com/@devlokos" icon={<Youtube className="w-5 h-5" />} />
-              <SocialLink href="https://open.spotify.com/show/3u6neVhqqDc693wTS16v1r?si=7FteYjGURHSzSxLtIHM6qg" icon={<Music2 className="w-5 h-5" />} />
-              <SocialLink href="https://instagram.com/devlokos" icon={<Instagram className="w-5 h-5" />} />
-              <SocialLink href="https://linkedin.com/company/devlokos" icon={<Linkedin className="w-5 h-5" />} />
-              <SocialLink href="https://tiktok.com/@devlokos" icon={<Music2 className="w-5 h-5" />} />
+              <SocialLink
+                href="https://youtube.com/@devlokos"
+                icon={<Youtube className="w-5 h-5" />}
+              />
+              <SocialLink
+                href="https://open.spotify.com/show/3u6neVhqqDc693wTS16v1r?si=7FteYjGURHSzSxLtIHM6qg"
+                icon={<Music2 className="w-5 h-5" />}
+              />
+              <SocialLink
+                href="https://instagram.com/devlokos"
+                icon={<Instagram className="w-5 h-5" />}
+              />
+              <SocialLink
+                href="https://linkedin.com/company/devlokos"
+                icon={<Linkedin className="w-5 h-5" />}
+              />
+              <SocialLink
+                href="https://tiktok.com/@devlokos"
+                icon={<Music2 className="w-5 h-5" />}
+              />
             </div>
 
             <div className="flex items-center gap-2 text-zinc-400 text-sm hover:text-white transition-colors">
@@ -79,15 +80,6 @@ export default function Footer() {
           </Link>
         </div>
       </div>
-
-      <PrivacyPolicyModal 
-        isOpen={isPrivacyModalOpen} 
-        onClose={() => setIsPrivacyModalOpen(false)} 
-      />
-      <TermsModal 
-        isOpen={isTermsModalOpen} 
-        onClose={() => setIsTermsModalOpen(false)} 
-      />
     </footer>
-  );
+  )
 }
