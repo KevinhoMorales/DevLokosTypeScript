@@ -7,6 +7,7 @@ import { Search, Palette, Code, Rocket, Check, Briefcase, FolderOpen, Phone, Com
 import { SectionIntro } from '@/components/ui/SectionIntro';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Chip } from '@/components/ui/Chip';
+import { AutoCarousel } from '@/components/ui/AutoCarousel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SECTION_CONTAINER } from '@/lib/section-layout';
@@ -280,7 +281,7 @@ export default function EnterpriseSection() {
 
       <div>
         <SectionHeader title="Nuestro proceso" align="start" className="mb-4" />
-        <div className="grid grid-cols-2 gap-2.5 max-w-3xl">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-3 w-full">
           {PROCESS_STEPS.map((step, i) => (
             <motion.div
               key={step.label}
@@ -288,13 +289,13 @@ export default function EnterpriseSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
-              className="rounded-2xl bg-[#0D0D0D] border border-primary/15 p-3.5 text-left"
+              className="rounded-2xl bg-card-bg border border-primary/15 p-3.5 md:p-4 text-left"
             >
               <div className="flex items-center justify-between mb-2">
                 <step.icon className="w-5 h-5 text-primary" />
                 <span className="text-primary text-xs font-bold tracking-wide">{step.num}</span>
               </div>
-              <p className="text-white font-semibold text-sm">{step.label}</p>
+              <p className="text-white font-semibold text-sm md:text-base">{step.label}</p>
             </motion.div>
           ))}
         </div>
@@ -494,13 +495,20 @@ function PortfolioGrid({
 
   return (
     <div className="w-full">
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-4 md:mb-5">
-        <div>
-          <SectionHeader title="Portafolio" align="start" className="mb-1" />
-          <p className="text-zinc-500 text-sm md:text-base">
-            {items.length} proyectos entregados — apps, web y productos reales.
-          </p>
-        </div>
+      <div className="mb-4 md:mb-5">
+        <SectionHeader
+          title="Portafolio"
+          align="start"
+          className="mb-1"
+          trailing={
+            <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/15 px-2.5 py-1 text-xs font-bold text-primary">
+              {items.length}
+            </span>
+          }
+        />
+        <p className="text-zinc-500 text-sm md:text-base">
+          Proyectos reales — desliza o déjalos pasar solos.
+        </p>
       </div>
 
       <div className="flex flex-wrap gap-2 mb-5 md:mb-6">
@@ -514,60 +522,48 @@ function PortfolioGrid({
       {filtered.length === 0 ? (
         <p className="text-zinc-500 text-sm py-8">No hay proyectos en esta categoría.</p>
       ) : (
-        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+        <AutoCarousel
+          key={filter}
+          label="Proyectos del portafolio"
+          speedPxPerSec={28}
+          itemClassName="min-w-[212px] max-w-[212px] sm:min-w-[240px] sm:max-w-[240px] md:min-w-[260px] md:max-w-[260px] shrink-0 h-[268px] sm:h-[286px] md:h-[300px]"
+        >
           {filtered.map((p) => {
             const cardClassName =
               'group h-full flex flex-col rounded-2xl overflow-hidden bg-card-bg border border-primary/15 hover:border-primary/45 transition-colors text-left shadow-[0_12px_40px_rgba(255,145,77,0.04)]';
             const inner = (
               <>
-                <div className="relative aspect-[4/3] sm:aspect-[5/4] bg-zinc-900 overflow-hidden shrink-0">
+                <div className="relative h-[132px] bg-zinc-900 overflow-hidden shrink-0">
                   {p.thumbnailUrl ? (
                     <Image
                       src={p.thumbnailUrl}
                       alt={p.title}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                      sizes="(max-width: 419px) 100vw, (max-width: 767px) 50vw, (max-width: 1279px) 33vw, 25vw"
+                      sizes="260px"
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/15 via-zinc-900 to-black text-zinc-600">
-                      <FolderOpen className="w-10 h-10 sm:w-12 sm:h-12" />
+                      <FolderOpen className="w-9 h-9" />
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
                   {p.category && (
-                    <span className="absolute left-2.5 top-2.5 sm:left-3 sm:top-3 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md bg-white text-black">
+                    <span className="absolute left-2.5 top-2.5 text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md bg-white text-black">
                       {p.category}
                     </span>
                   )}
                 </div>
-                <div className="p-3.5 sm:p-4 md:p-5 flex flex-col flex-1 gap-1.5 sm:gap-2">
-                  <h4 className="text-white text-sm sm:text-base font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                <div className="p-3 sm:p-3.5 flex flex-col flex-1 gap-1.5 min-h-0">
+                  <h4 className="text-white text-sm font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
                     {p.title}
                   </h4>
                   {p.description && (
-                    <p className="text-zinc-400 text-xs sm:text-sm line-clamp-2 md:line-clamp-3 leading-relaxed">
+                    <p className="text-zinc-400 text-xs line-clamp-3 leading-relaxed">
                       {p.description}
                     </p>
                   )}
-                  {p.technologies && p.technologies.length > 0 && (
-                    <div className="hidden sm:flex flex-wrap gap-1.5 pt-0.5">
-                      {p.technologies.slice(0, 3).map((t) => (
-                        <span
-                          key={t}
-                          className="px-2 py-0.5 rounded-full border border-white/10 bg-white/5 text-[11px] text-zinc-400"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                      {p.technologies.length > 3 && (
-                        <span className="px-2 py-0.5 text-[11px] text-zinc-500">
-                          +{p.technologies.length - 3}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  <p className="text-primary text-xs sm:text-sm font-semibold mt-auto pt-2">
+                  <p className="text-primary text-sm font-semibold mt-auto pt-1">
                     Ver proyecto
                   </p>
                 </div>
@@ -594,7 +590,7 @@ function PortfolioGrid({
               </div>
             );
           })}
-        </div>
+        </AutoCarousel>
       )}
     </div>
   );
