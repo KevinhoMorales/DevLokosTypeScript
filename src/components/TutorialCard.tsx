@@ -33,7 +33,7 @@ export function TutorialCard({ title, thumbnailUrl, publishedAt, onClick }: Tuto
     <motion.div
       whileHover={{ y: -4 }}
       onClick={onClick}
-      className="group flex flex-col rounded-2xl overflow-hidden bg-[#0D0D0D] border border-white/10 hover:border-primary/50 cursor-pointer transition-colors"
+      className="group flex flex-col rounded-2xl overflow-hidden bg-[#0D0D0D] border border-primary/15 hover:border-primary/40 cursor-pointer transition-colors shadow-none"
     >
       <div className="relative w-full aspect-video bg-zinc-900 overflow-hidden">
         {thumbnailUrl ? (
@@ -45,9 +45,9 @@ export function TutorialCard({ title, thumbnailUrl, publishedAt, onClick }: Tuto
             sizes="(max-width: 768px) 100vw, 33vw"
           />
         ) : null}
-        <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/30 transition-colors">
-          <div className="rounded-full bg-white/95 p-4 shadow-lg">
-            <Play className="w-8 h-8 text-primary fill-primary ml-0.5" />
+        <div className="absolute inset-0 flex items-center justify-center bg-black/35 group-hover:bg-black/25 transition-colors">
+          <div className="rounded-full bg-primary/90 p-2.5">
+            <Play className="w-5 h-5 text-white fill-white ml-0.5" />
           </div>
         </div>
       </div>

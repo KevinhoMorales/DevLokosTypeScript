@@ -6,6 +6,7 @@ import { Calendar, MapPin, X } from 'lucide-react';
 import { analyticsEvents } from '@/lib/analytics';
 import { EventCard, type EventCardData, formatEventDate } from '@/components/EventCard';
 import { SectionIntro } from '@/components/ui/SectionIntro';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
@@ -116,7 +117,7 @@ export default function CommunitySection() {
           <div className="space-y-12">
             {upcoming.length > 0 && (
               <div>
-                <h3 className="text-xl font-semibold text-white mb-6">Próximos</h3>
+                <SectionHeader title="Próximos" align="center" className="mb-6" />
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {upcoming.map((event, i) => (
                     <motion.div
@@ -134,7 +135,7 @@ export default function CommunitySection() {
 
             {past.length > 0 && (
               <div>
-                <h3 className="text-xl font-semibold text-white mb-6">Pasados</h3>
+                <SectionHeader title="Pasados" align="center" className="mb-6" />
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {past.map((event, i) => (
                     <motion.div

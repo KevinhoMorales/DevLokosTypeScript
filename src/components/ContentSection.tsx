@@ -5,6 +5,7 @@ import { Video, SearchX } from 'lucide-react';
 import { analyticsEvents } from '@/lib/analytics';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionIntro } from '@/components/ui/SectionIntro';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
@@ -169,7 +170,7 @@ export default function ContentSection() {
               value={search}
               onChange={setSearch}
               placeholder="Buscar por título..."
-              className="mb-6"
+              className="mb-6 max-w-2xl"
             />
             <div className="flex flex-wrap gap-2 justify-center mb-8">
               {playlists.map((p) => (
@@ -179,16 +180,30 @@ export default function ContentSection() {
                     setSelectedPlaylistId(p.id);
                     analyticsEvents.playlist_chip_selected(p.id, p.title);
                   }}
-                  className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                     selectedPlaylistId === p.id
-                      ? 'bg-primary text-white border border-primary'
-                      : 'bg-white/5 text-zinc-400 border border-white/10 hover:border-primary/50 hover:text-white'
+                      ? 'bg-primary/15 text-primary border border-primary/70'
+                      : 'bg-[#0D0D0D] text-zinc-400 border border-primary/15 hover:border-primary/40 hover:text-white'
                   }`}
                 >
                   {p.title}
                 </button>
               ))}
             </div>
+
+            {selectedPlaylist && (
+              <div className="mb-6">
+                <SectionHeader
+                  title={selectedPlaylist.title}
+                  align="center"
+                  trailing={
+                    <span className="text-zinc-500 text-sm font-semibold">
+                      {filteredTutorials.length}
+                    </span>
+                  }
+                />
+              </div>
+            )}
 
             {loadingVideos && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

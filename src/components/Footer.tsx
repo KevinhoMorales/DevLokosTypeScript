@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { useState } from 'react';
+import Link from 'next/link';
 import { Instagram, Linkedin, Mail, Music2, Youtube } from "lucide-react"
 import { Logo } from "@/components/Logo"
 import PrivacyPolicyModal from './PrivacyPolicyModal';
@@ -27,19 +28,18 @@ export default function Footer() {
   return (
     <footer className="w-full bg-black border-t border-white/10 py-12">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-start gap-8">
-          {/* Left Column */}
-          <div className="space-y-4">
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-10 text-center md:text-left">
+          <div className="space-y-4 flex flex-col items-center md:items-start">
             <Logo />
             <p className="text-zinc-500 text-sm">© {new Date().getFullYear()} DevLokos</p>
-            <div className="flex gap-4 text-xs text-zinc-500">
+            <div className="flex flex-wrap justify-center md:justify-start gap-4 text-xs text-zinc-500">
               <button 
                 onClick={() => setIsTermsModalOpen(true)}
                 className="hover:text-white transition-colors cursor-pointer"
               >
                 Términos de Servicio
               </button>
-              <span>|</span>
+              <span className="text-zinc-700">|</span>
               <button 
                 onClick={() => setIsPrivacyModalOpen(true)}
                 className="hover:text-white transition-colors cursor-pointer"
@@ -49,12 +49,13 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Right Column */}
-          <div className="space-y-4">
+          <div className="space-y-4 flex flex-col items-center md:items-end">
             <h3 className="text-white font-bold">Contáctanos</h3>
-            <p className="text-zinc-400 text-sm">¿Preguntas o comentarios? Nos encantaría escucharte.</p>
+            <p className="text-zinc-400 text-sm max-w-xs md:text-right">
+              ¿Preguntas o comentarios? Nos encantaría escucharte.
+            </p>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap justify-center md:justify-end gap-4">
               <SocialLink href="https://youtube.com/@devlokos" icon={<Youtube className="w-5 h-5" />} />
               <SocialLink href="https://open.spotify.com/show/3u6neVhqqDc693wTS16v1r?si=7FteYjGURHSzSxLtIHM6qg" icon={<Music2 className="w-5 h-5" />} />
               <SocialLink href="https://instagram.com/devlokos" icon={<Instagram className="w-5 h-5" />} />
@@ -68,9 +69,17 @@ export default function Footer() {
             </div>
           </div>
         </div>
+
+        <div className="mt-10 pt-6 border-t border-white/5 flex justify-center">
+          <Link
+            href="/admin/login"
+            className="text-[11px] tracking-wide text-zinc-600 hover:text-zinc-400 transition-colors"
+          >
+            Acceso
+          </Link>
+        </div>
       </div>
 
-      {/* Modals */}
       <PrivacyPolicyModal 
         isOpen={isPrivacyModalOpen} 
         onClose={() => setIsPrivacyModalOpen(false)} 

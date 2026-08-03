@@ -6,6 +6,7 @@ import { BookOpen, Check, ChevronDown, X, Clock, Layers, MessageCircle, SearchX,
 import { analyticsEvents } from '@/lib/analytics';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionIntro } from '@/components/ui/SectionIntro';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
@@ -15,6 +16,8 @@ import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
 const WHATSAPP_NUMBER = '593939598029';
+const ACADEMY_WHATSAPP_MSG =
+  'Hola, me gustaría inscribirme en la Academia DevLokos. ¿Cuáles son los pasos?';
 
 function formatDuration(minutes: number | undefined): string {
   if (!minutes || minutes <= 0) return '';
@@ -128,7 +131,7 @@ export default function AcademySection() {
       <SectionIntro>
         Cursos estructurados por rutas de aprendizaje. Formación guiada para desarrolladores que buscan crecer paso a paso.
       </SectionIntro>
-      <SearchBar value={search} onChange={setSearch} placeholder="Buscar cursos..." className="mb-6" />
+      <SearchBar value={search} onChange={setSearch} placeholder="Buscar cursos..." className="mb-6 max-w-2xl" />
 
         {loading && <LoadingSkeleton count={8} variant="card" className="sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" />}
 
@@ -151,13 +154,28 @@ export default function AcademySection() {
         {!loading && !error && courses.length === 0 && (
           <EmptyState
             icon={<BookOpen className="w-12 h-12 text-primary" />}
-            title="Academia próximamente"
-            subtitle="Estamos preparando los cursos."
+            title="Próximamente"
+            subtitle="Estamos preparando los cursos de la Academia. Mientras tanto, escríbenos por WhatsApp."
+            action={
+              <Button className="bg-primary hover:bg-primary/90 text-white" asChild>
+                <a
+                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(ACADEMY_WHATSAPP_MSG)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Consultar por WhatsApp
+                </a>
+              </Button>
+            }
           />
         )}
 
         {!loading && !error && courses.length > 0 && (
           <>
+            <div className="mb-6">
+              <SectionHeader title="Cursos" align="center" />
+            </div>
             <div className="flex flex-wrap gap-2 justify-center mb-8">
               <div className="relative inline-flex items-center">
                 <select
@@ -170,10 +188,10 @@ export default function AcademySection() {
                       analyticsEvents.filter_applied('learning_path', v, 'academy');
                     }
                   }}
-                  className={`appearance-none border rounded-full pl-5 pr-10 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none cursor-pointer ${
+                  className={`appearance-none border rounded-xl pl-4 pr-10 py-2 text-sm font-medium transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none cursor-pointer ${
                     filterPath
-                      ? 'bg-primary text-white border-primary'
-                      : 'bg-white/5 text-zinc-400 border-white/10 hover:border-primary/50 hover:text-white'
+                      ? 'bg-primary/15 text-primary border-primary/70'
+                      : 'bg-[#0D0D0D] text-zinc-400 border-primary/15 hover:border-primary/40 hover:text-white'
                   }`}
                 >
                   <option value="">Ruta de aprendizaje</option>
@@ -183,7 +201,7 @@ export default function AcademySection() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className={`absolute right-3 w-4 h-4 pointer-events-none ${filterPath ? 'text-white' : 'text-zinc-400'}`} aria-hidden />
+                <ChevronDown className={`absolute right-3 w-4 h-4 pointer-events-none ${filterPath ? 'text-primary' : 'text-zinc-400'}`} aria-hidden />
               </div>
               <div className="relative inline-flex items-center">
                 <select
@@ -195,29 +213,30 @@ export default function AcademySection() {
                       analyticsEvents.filter_applied('difficulty', v, 'academy');
                     }
                   }}
-                  className={`appearance-none border rounded-full pl-5 pr-10 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none cursor-pointer ${
+                  className={`appearance-none border rounded-xl pl-4 pr-10 py-2 text-sm font-medium transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none cursor-pointer ${
                     filterDifficulty
-                      ? 'bg-primary text-white border-primary'
-                      : 'bg-white/5 text-zinc-400 border-white/10 hover:border-primary/50 hover:text-white'
+                      ? 'bg-primary/15 text-primary border-primary/70'
+                      : 'bg-[#0D0D0D] text-zinc-400 border-primary/15 hover:border-primary/40 hover:text-white'
                   }`}
                 >
                   <option value="">Dificultad</option>
                   {difficulties.map((d) => (
                     <option key={d} value={d}>
-                      {d === 'Beginner' ? 'Principiante' : d === 'Intermediate' ? 'Intermedio' : d === 'Advanced' ? 'Avanzado' : d}
+                      {difficultyLabel(d)}
                     </option>
                   ))}
                 </select>
-                <ChevronDown className={`absolute right-3 w-4 h-4 pointer-events-none ${filterDifficulty ? 'text-white' : 'text-zinc-400'}`} aria-hidden />
+                <ChevronDown className={`absolute right-3 w-4 h-4 pointer-events-none ${filterDifficulty ? 'text-primary' : 'text-zinc-400'}`} aria-hidden />
               </div>
-              {(filterPath || filterDifficulty) && (
+              {(filterPath || filterDifficulty || search.trim()) && (
                 <Button
                   variant="outline"
                   onClick={() => {
                     setFilterPath('');
                     setFilterDifficulty('');
+                    setSearch('');
                   }}
-                  className="rounded-full px-5 py-2.5 text-sm font-medium bg-white/5 text-zinc-400 border border-white/10 hover:border-primary/50 hover:text-white transition-all"
+                  className="rounded-xl px-4 py-2 text-sm font-medium bg-[#0D0D0D] text-zinc-400 border border-primary/15 hover:border-primary/40 hover:text-white transition-all"
                 >
                   Limpiar
                 </Button>
@@ -225,7 +244,24 @@ export default function AcademySection() {
             </div>
 
             {filtered.length === 0 ? (
-              <EmptyState icon={<SearchX className="h-14 w-14" />} title="No se encontraron cursos" subtitle="Prueba otros filtros o búsqueda." />
+              <EmptyState
+                icon={<SearchX className="h-14 w-14" />}
+                title="No se encontraron cursos"
+                subtitle="Prueba otros filtros o limpia la búsqueda."
+                action={
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setFilterPath('');
+                      setFilterDifficulty('');
+                      setSearch('');
+                    }}
+                    className="rounded-xl border-primary/30 text-primary hover:bg-primary/10"
+                  >
+                    Limpiar filtros
+                  </Button>
+                }
+              />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filtered.map((course, i) => (

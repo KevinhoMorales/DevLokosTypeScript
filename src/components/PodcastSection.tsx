@@ -8,6 +8,7 @@ import { SectionIntro } from "@/components/ui/SectionIntro"
 import { SearchBar } from "@/components/ui/SearchBar"
 import { SeasonFilter } from "@/components/ui/SeasonFilter"
 import { SectionHeader } from "@/components/ui/SectionHeader"
+import { AutoCarousel } from "@/components/ui/AutoCarousel"
 import { EmptyState } from "@/components/ui/EmptyState"
 import { ErrorState } from "@/components/ui/ErrorState"
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton"
@@ -220,35 +221,28 @@ export default function PodcastSection() {
         <>
           {!searchQuery.trim() && discoverEpisodes.length > 0 && (
             <div className="space-y-6">
-              <SectionHeader title="Descubre" />
-              <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 snap-x snap-mandatory scrollbar-thin">
-                {discoverEpisodes.map((episode, index) => (
-                  <motion.div
+              <SectionHeader title="Descubre" align="center" />
+              <AutoCarousel label="Episodios para descubrir" intervalMs={5000}>
+                {discoverEpisodes.map((episode) => (
+                  <EpisodeCard
                     key={`discover-${episode.id}`}
-                    initial={{ opacity: 0, y: 12 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.05 }}
-                    className="min-w-[280px] max-w-[300px] snap-start shrink-0"
-                  >
-                    <EpisodeCard
-                      title={episode.title}
-                      guest={episode.guest}
-                      duration={episode.duration}
-                      image={episode.thumbnail || "/placeholder.svg"}
-                      description={episode.description}
-                      episodeNumber={episode.id}
-                      onClick={() => handleEpisodeClick(episode, 'discover')}
-                    />
-                  </motion.div>
+                    title={episode.title}
+                    guest={episode.guest}
+                    duration={episode.duration}
+                    image={episode.thumbnail || "/placeholder.svg"}
+                    description={episode.description}
+                    episodeNumber={episode.id}
+                    onClick={() => handleEpisodeClick(episode, 'discover')}
+                  />
                 ))}
-              </div>
+              </AutoCarousel>
             </div>
           )}
 
           <div className="space-y-6">
             <SectionHeader
               title="Episodios"
+              align="center"
               trailing={
                 !searchQuery.trim() ? (
                   <SeasonFilter value={selectedSeason} onChange={setSelectedSeason} />
