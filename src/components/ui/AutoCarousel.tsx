@@ -19,8 +19,11 @@ interface AutoCarouselProps {
   label?: string;
 }
 
+const RESUME_DELAY_MS = 2000;
+
 /**
- * Horizontal snap carousel with autoplay (~5s), pause on hover/focus/drag, and dots.
+ * Horizontal snap carousel with autoplay (~5s), pause on focus/drag, and dots.
+ * Resumes ~2s after pointer/touch interaction ends.
  */
 export function AutoCarousel({
   children,
@@ -33,22 +36,62 @@ export function AutoCarousel({
   const [active, setActive] = useState(0);
   const activeRef = useRef(0);
   const [paused, setPaused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
   const draggingRef = useRef(false);
+  const resumeTimerRef = useRef<number | null>(null);
   const count = children.length;
 
   useEffect(() => {
     activeRef.current = active;
   }, [active]);
 
-  const scrollToIndex = useCallback((index: number, behavior: ScrollBehavior = 'smooth') => {
-    const el = scrollerRef.current;
-    if (!el || count === 0) return;
-    const i = ((index % count) + count) % count;
-    const child = el.children[i] as HTMLElement | undefined;
-    if (!child) return;
-    el.scrollTo({ left: child.offsetLeft - el.offsetLeft, behavior });
-    setActive(i);
-  }, [count]);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReducedMotion(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  const clearResumeTimer = useCallback(() => {
+    if (resumeTimerRef.current != null) {
+      window.clearTimeout(resumeTimerRef.current);
+      resumeTimerRef.current = null;
+    }
+  }, []);
+
+  const pauseForInteraction = useCallback(() => {
+    clearResumeTimer();
+    draggingRef.current = true;
+    setPaused(true);
+  }, [clearResumeTimer]);
+
+  const scheduleResume = useCallback(() => {
+    draggingRef.current = false;
+    clearResumeTimer();
+    resumeTimerRef.current = window.setTimeout(() => {
+      resumeTimerRef.current = null;
+      setPaused(false);
+    }, RESUME_DELAY_MS);
+  }, [clearResumeTimer]);
+
+  useEffect(() => () => clearResumeTimer(), [clearResumeTimer]);
+
+  const scrollToIndex = useCallback(
+    (index: number, behavior: ScrollBehavior = 'smooth') => {
+      const el = scrollerRef.current;
+      if (!el || count === 0) return;
+      const i = ((index % count) + count) % count;
+      const child = el.children[i] as HTMLElement | undefined;
+      if (!child) return;
+      const scrollBehavior =
+        reducedMotion || behavior === 'auto' ? 'auto' : behavior;
+      el.scrollTo({ left: child.offsetLeft - el.offsetLeft, behavior: scrollBehavior });
+      setActive(i);
+    },
+    [count, reducedMotion],
+  );
 
   const updateActiveFromScroll = useCallback(() => {
     const el = scrollerRef.current;
@@ -78,13 +121,13 @@ export function AutoCarousel({
   }, [updateActiveFromScroll]);
 
   useEffect(() => {
-    if (paused || count <= 1) return;
+    if (paused || reducedMotion || count <= 1) return;
     const id = window.setInterval(() => {
       if (draggingRef.current) return;
       scrollToIndex(activeRef.current + 1);
     }, intervalMs);
     return () => window.clearInterval(id);
-  }, [paused, count, intervalMs, scrollToIndex]);
+  }, [paused, reducedMotion, count, intervalMs, scrollToIndex]);
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'ArrowRight') {
@@ -101,9 +144,10 @@ export function AutoCarousel({
   return (
     <div
       className={`space-y-4 ${className}`}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
+      onFocusCapture={() => {
+        clearResumeTimer();
+        setPaused(true);
+      }}
       onBlurCapture={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
           setPaused(false);
@@ -117,21 +161,12 @@ export function AutoCarousel({
         aria-label={label}
         tabIndex={0}
         onKeyDown={onKeyDown}
-        onPointerDown={() => {
-          draggingRef.current = true;
-          setPaused(true);
-        }}
-        onPointerUp={() => {
-          draggingRef.current = false;
-        }}
-        onTouchStart={() => {
-          draggingRef.current = true;
-          setPaused(true);
-        }}
-        onTouchEnd={() => {
-          draggingRef.current = false;
-          setPaused(false);
-        }}
+        onPointerDown={pauseForInteraction}
+        onPointerUp={scheduleResume}
+        onPointerCancel={scheduleResume}
+        onTouchStart={pauseForInteraction}
+        onTouchEnd={scheduleResume}
+        onTouchCancel={scheduleResume}
         className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 snap-x snap-mandatory scrollbar-thin outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-xl"
       >
         {children.map((child, index) => (

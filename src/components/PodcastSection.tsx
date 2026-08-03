@@ -295,7 +295,7 @@ export default function PodcastSection() {
               <SectionHeader title="Descubre" align="start" />
               <AutoCarousel
                 label="Episodios para descubrir"
-                intervalMs={5000}
+                intervalMs={4500}
                 itemClassName="min-w-[240px] max-w-[260px] md:min-w-[260px] md:max-w-[280px] lg:min-w-[280px] lg:max-w-[300px] snap-start shrink-0"
               >
                 {discoverEpisodes.map((episode) => (
