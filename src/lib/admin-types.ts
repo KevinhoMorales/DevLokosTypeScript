@@ -56,6 +56,23 @@ export type AdminPortfolio = {
   createdAt?: string;
 };
 
+export type AdminProductStoreLink = {
+  label: string;
+  url: string;
+};
+
+export type AdminProduct = {
+  id: string;
+  title: string;
+  description: string;
+  thumbnailUrl?: string;
+  type: 'book' | 'digital' | 'other' | string;
+  storeLinks: AdminProductStoreLink[];
+  isPublished: boolean;
+  order: number;
+  createdAt?: string;
+};
+
 export const DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced'] as const;
 
 export const LEARNING_PATHS = [

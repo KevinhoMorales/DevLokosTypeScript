@@ -31,6 +31,8 @@ export async function POST(req: NextRequest) {
       path = `events/images/event_${entityId}_${ts}${ext}`;
     } else if (type === 'portfolio') {
       path = `portfolio/images/portfolio_${entityId}_${ts}${ext}`;
+    } else if (type === 'product') {
+      path = `products/images/product_${entityId}_${ts}${ext}`;
     } else {
       path = `courses/covers/cover_${entityId}_${ts}${ext}`;
     }

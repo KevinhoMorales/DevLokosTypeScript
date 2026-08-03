@@ -4,6 +4,14 @@ import admin from 'firebase-admin';
 import { getFirestore } from '@/lib/firebase-admin';
 import { FIREBASE_ENV } from '@/lib/firestore-helpers';
 
+/**
+ * Autorización del CMS web.
+ *
+ * Hoy: email presente en `{FIREBASE_ENV}/{FIREBASE_ENV}/admin`.
+ * La app móvil también guarda `accountRole` en `users/{uid}` (`user`|`member`|`admin`);
+ * ese campo NO sustituye aún esta colección para el panel `/admin`.
+ */
+
 export class AuthAdminError extends Error {
   status: number;
   constructor(message: string, status: number) {

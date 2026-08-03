@@ -1,0 +1,21 @@
+[
+  {
+    "id": "dominando-kotlin-swift-dart",
+    "title": "Dominando Kotlin, Swift y Dart",
+    "description": "Guía práctica en español para construir apps sólidas con Kotlin, Swift y Dart. Arquitectura, interop multiplataforma y criterios que marcan tu carrera como mobile engineer. Disponible en Gumroad y Amazon.",
+    "thumbnailUrl": "https://kevinhomorales.com/images/book-cover.png",
+    "type": "book",
+    "storeLinks": [
+      {
+        "label": "Amazon",
+        "url": "https://a.co/d/0j6CE9Gz"
+      },
+      {
+        "label": "Gumroad",
+        "url": "https://kevinhomorales.gumroad.com/l/book"
+      }
+    ],
+    "isPublished": true,
+    "order": 0
+  }
+]

@@ -50,6 +50,7 @@ const ROUTE_TO_MODULE: Record<string, string> = {
   '/podcast': 'podcast',
   '/tutoriales': 'tutorials',
   '/academia': 'academy',
+  '/productos': 'products',
   '/empresarial': 'enterprise',
   '/eventos': 'events',
 };
@@ -191,6 +192,17 @@ export const analyticsEvents = {
   },
   academy_whatsapp_clicked(course_title: string) {
     logEvent('academy_whatsapp_clicked', { course_title: truncate(course_title) });
+  },
+
+  // --- Productos ---
+  products_viewed() {
+    logEvent('products_viewed');
+  },
+  product_store_clicked(product_id: string, store_label: string) {
+    logEvent('product_store_clicked', {
+      product_id: truncate(product_id),
+      store_label: truncate(store_label),
+    });
   },
 
   // --- Empresarial ---

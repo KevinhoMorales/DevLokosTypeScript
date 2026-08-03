@@ -11,6 +11,7 @@ const navLinks = [
   { href: '/podcast', label: 'Podcast' },
   { href: '/tutoriales', label: 'Tutoriales' },
   { href: '/academia', label: 'Academia' },
+  { href: '/productos', label: 'Productos' },
   { href: '/empresarial', label: 'Empresarial' },
   { href: '/eventos', label: 'Eventos' },
 ];

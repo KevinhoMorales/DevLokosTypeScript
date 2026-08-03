@@ -8,6 +8,8 @@ export interface PortfolioDoc {
   thumbnailUrl?: string;
   technologies?: string[];
   category?: string;
+  projectUrl?: string;
+  caseStudyUrl?: string;
   order?: number;
 }
 
@@ -25,6 +27,8 @@ export async function GET() {
           thumbnailUrl: d.thumbnailUrl,
           technologies: d.technologies ?? [],
           category: d.category,
+          projectUrl: d.projectUrl || undefined,
+          caseStudyUrl: d.caseStudyUrl || undefined,
           order: d.order ?? 0,
         };
       })

@@ -1,0 +1,127 @@
+[
+  {
+    "id": "saints",
+    "title": "SAINTS",
+    "description": "App multiplataforma en Flutter del Saints Wellness Club®: comunidad de running en Santo Domingo, Ecuador, con el lema Run & Have Fun! Conecta corredores con entrenamientos, trail, eventos, carreras como Saints Trail y 8K Tenka Run, bienestar y la vida social del club desde iOS y Android.",
+    "thumbnailUrl": "https://kevinhomorales.com/images/saints-icon.png",
+    "technologies": [
+      "Dart",
+      "Flutter"
+    ],
+    "category": "Mobile",
+    "projectUrl": "https://apps.apple.com/us/app/saints/id6792610093",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -20260701
+  },
+  {
+    "id": "tayos",
+    "title": "Tayos",
+    "description": "App B2B de repuestos automotrices para la distribuidora más grande del Ecuador — catálogo digital con 30.000+ productos, búsqueda rápida y pedidos para talleres y empresas.",
+    "thumbnailUrl": "https://kevinhomorales.com/images/tayos-icon.png",
+    "technologies": [
+      "React Native",
+      "TypeScript"
+    ],
+    "category": "Mobile",
+    "projectUrl": "https://devlokos.com/empresarial",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -20260715
+  },
+  {
+    "id": "orion-solar-group",
+    "title": "Orion Solar Group",
+    "description": "Sitio web corporativo de Orion Solar Group: empresa de energía solar en Ecuador con más de 500 instalaciones. Presenta instalación de paneles, mantenimiento y monitoreo, consultoría energética y soluciones para empresas, con cotización en línea, testimonios y estimación de ahorro en la factura eléctrica para hogares y negocios.",
+    "thumbnailUrl": "https://kevinhomorales.com/images/orion-solar-group-icon.png",
+    "technologies": [
+      "React",
+      "TypeScript",
+      "Vite",
+      "Vercel"
+    ],
+    "category": "Web",
+    "projectUrl": "https://orionsolarg.com/",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -20260501
+  },
+  {
+    "id": "santo-domingo-pickleball-club",
+    "title": "Santo Domingo Pickleball Club",
+    "description": "Sitio web oficial del Santo Domingo Pickleball Club: promueve el pickleball en Ecuador con entrenamientos para todos los niveles, torneos, información de canchas, inscripción al Santo Domingo Pickleball Open 2026 y una comunidad deportiva inclusiva en Santo Domingo de los Tsáchilas.",
+    "thumbnailUrl": "https://kevinhomorales.com/images/santo-domingo-pickleball-club-icon.png",
+    "technologies": [
+      "Next.js",
+      "React",
+      "TypeScript"
+    ],
+    "category": "Web",
+    "projectUrl": "https://www.santodomingopickleballclub.com/",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -20260601
+  },
+  {
+    "id": "devlokos",
+    "title": "DevLokos",
+    "description": "Sitio web oficial del podcast y comunidad DevLokos: episodios, blog, recursos para desarrolladores, eventos y presencia digital de la marca — construido con Next.js y desplegado en Vercel.",
+    "thumbnailUrl": "https://kevinhomorales.com/images/devlokos-logo.png",
+    "technologies": [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Vercel"
+    ],
+    "category": "Web",
+    "projectUrl": "https://devlokos.com/",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -996
+  },
+  {
+    "id": "devlokos-app",
+    "title": "DevLokos",
+    "description": "App multiplataforma del podcast DevLokos en Flutter: escucha episodios, explora contenido de la comunidad y accede a recursos para desarrolladores desde iOS y Android.",
+    "thumbnailUrl": null,
+    "technologies": [
+      "Dart",
+      "Flutter"
+    ],
+    "category": "Mobile",
+    "projectUrl": "https://devlokos.com/",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -995
+  },
+  {
+    "id": "padeltrack",
+    "title": "PadelTrack",
+    "description": "Padel sports tracking app",
+    "thumbnailUrl": null,
+    "technologies": [
+      "Dart",
+      "Flutter"
+    ],
+    "category": "Mobile",
+    "projectUrl": "https://apps.apple.com/ec/app/padeltrack/id6749497707",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -20251201
+  },
+  {
+    "id": "elite-padel",
+    "title": "Élite Padel: Ranking Oficial",
+    "description": "App oficial de ranking de Élite Padel Santo Domingo: consulta posiciones, estadísticas y torneos de la comunidad de pádel en Ecuador. Desarrollada nativamente con SwiftUI en iOS y Jetpack Compose en Android.",
+    "thumbnailUrl": "https://kevinhomorales.com/images/elite-padel-icon.png",
+    "technologies": [
+      "SwiftUI",
+      "Jetpack Compose"
+    ],
+    "category": "Mobile",
+    "projectUrl": "https://apps.apple.com/jm/app/%C3%A9lite-padel-ranking-oficial/id6742730017",
+    "caseStudyUrl": null,
+    "isPublished": true,
+    "order": -20250901
+  }
+]

@@ -242,7 +242,11 @@ Panel en **`/admin`** (no aparece en la NavBar pública).
 3. Entra a `/admin/login` con email/password de Firebase Auth
 4. Gestiona: **Cursos**, **Eventos**, **Servicios**, **Portfolio**
 
-APIs protegidas con Bearer ID token + verificación de email admin.
+APIs protegidas con Bearer ID token + verificación de email en la colección `admin`.
+
+### Roles de cuenta (app)
+
+La app móvil guarda `accountRole` (`user` | `member` | `admin`) en `{FIREBASE_ENV}/{FIREBASE_ENV}/users/{uid}` al registrarse (siempre `user`). Tipos y helpers: [`src/lib/account-roles.ts`](src/lib/account-roles.ts), [`getUsersRef`](src/lib/firestore-helpers.ts). El CMS **aún no** usa `accountRole` para autorizar; sigue con la colección `admin`.
 
 ## Pendientes conocidos
 

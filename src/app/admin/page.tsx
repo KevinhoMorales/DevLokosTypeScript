@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { BookOpen, Calendar, Briefcase, Layers } from 'lucide-react';
+import { BookOpen, Calendar, Briefcase, Layers, ShoppingBag } from 'lucide-react';
 
 const modules = [
   {
@@ -27,6 +27,12 @@ const modules = [
     title: 'Portfolio',
     description: 'Proyectos destacados del módulo Empresarial.',
     icon: Layers,
+  },
+  {
+    href: '/admin/products',
+    title: 'Productos',
+    description: 'Catálogo de venta: libros y productos digitales.',
+    icon: ShoppingBag,
   },
 ];
 

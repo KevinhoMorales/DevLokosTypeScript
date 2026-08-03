@@ -27,6 +27,19 @@ export function getPortfolioRef(db: admin.firestore.Firestore) {
   return db.collection('portfolio');
 }
 
+/** Colección raíz products (catálogo de venta). */
+export function getProductsRef(db: admin.firestore.Firestore) {
+  return db.collection('products');
+}
+
+/**
+ * Usuarios de la app: {env}/{env}/users.
+ * Campo de acceso: `accountRole` (`user` | `member` | `admin`). Ver account-roles.ts.
+ */
+export function getUsersRef(db: admin.firestore.Firestore) {
+  return db.collection(FIREBASE_ENV).doc(FIREBASE_ENV).collection('users');
+}
+
 /**
  * Convierte un valor de Firestore (Timestamp o lo que sea) a Date o valor original.
  */
@@ -113,6 +126,33 @@ export function parsePortfolioDoc(id: string, data: Record<string, unknown>) {
     category: (data.category as string) ?? '',
     projectUrl: data.projectUrl as string | undefined,
     caseStudyUrl: data.caseStudyUrl as string | undefined,
+    isPublished: data.isPublished !== false,
+    order: typeof data.order === 'number' ? data.order : 0,
+    createdAt: createdAt instanceof Date ? createdAt.toISOString() : new Date().toISOString(),
+  };
+}
+
+export function parseProductDoc(id: string, data: Record<string, unknown>) {
+  const createdAt = parseTimestamp(data.createdAt);
+  const rawLinks = Array.isArray(data.storeLinks) ? data.storeLinks : [];
+  const storeLinks = rawLinks
+    .map((link) => {
+      if (!link || typeof link !== 'object') return null;
+      const l = link as { label?: unknown; url?: unknown };
+      const label = String(l.label || '').trim();
+      const url = String(l.url || '').trim();
+      if (!label || !url) return null;
+      return { label, url };
+    })
+    .filter((x): x is { label: string; url: string } => x != null);
+
+  return {
+    id,
+    title: (data.title as string) ?? '',
+    description: (data.description as string) ?? '',
+    thumbnailUrl: data.thumbnailUrl as string | undefined,
+    type: (data.type as string) ?? 'other',
+    storeLinks,
     isPublished: data.isPublished !== false,
     order: typeof data.order === 'number' ? data.order : 0,
     createdAt: createdAt instanceof Date ? createdAt.toISOString() : new Date().toISOString(),

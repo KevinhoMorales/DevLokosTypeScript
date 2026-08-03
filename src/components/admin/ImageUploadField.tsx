@@ -9,7 +9,7 @@ type Props = {
   value?: string;
   onChange: (url: string) => void;
   token: string | null;
-  type: 'course' | 'event' | 'portfolio';
+  type: 'course' | 'event' | 'portfolio' | 'product';
   entityId?: string;
 };
 

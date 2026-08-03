@@ -50,6 +50,7 @@ interface PortfolioItem {
   description?: string;
   thumbnailUrl?: string;
   technologies?: string[];
+  projectUrl?: string;
 }
 
 const FALLBACK_SERVICES: Service[] = [
@@ -340,43 +341,64 @@ export default function EnterpriseSection() {
         <div>
           <SectionHeader title="Portafolio" align="start" className="mb-4" />
           <div className="overflow-x-auto flex gap-3 pb-4 snap-x snap-mandatory md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-visible max-w-5xl">
-            {portfolio.map((p) => (
-              <div
-                key={p.id}
-                className="flex-shrink-0 w-[260px] md:w-full snap-center rounded-2xl overflow-hidden bg-[#0D0D0D] border border-primary/15 hover:border-primary/40 transition-colors"
-              >
-                <div className="relative aspect-video bg-zinc-900">
-                  {p.thumbnailUrl ? (
-                    <Image
-                      src={p.thumbnailUrl}
-                      alt={p.title}
-                      fill
-                      className="object-cover"
-                      sizes="280px"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
-                      <FolderOpen className="w-16 h-16" />
-                    </div>
-                  )}
+            {portfolio.map((p) => {
+              const cardClassName =
+                'flex-shrink-0 w-[260px] md:w-full snap-center rounded-2xl overflow-hidden bg-[#0D0D0D] border border-primary/15 hover:border-primary/40 transition-colors text-left block';
+              const inner = (
+                <>
+                  <div className="relative aspect-video bg-zinc-900">
+                    {p.thumbnailUrl ? (
+                      <Image
+                        src={p.thumbnailUrl}
+                        alt={p.title}
+                        fill
+                        className="object-cover"
+                        sizes="280px"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
+                        <FolderOpen className="w-16 h-16" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h4 className="text-white font-semibold mb-1">{p.title}</h4>
+                    {p.description && (
+                      <p className="text-zinc-400 text-sm line-clamp-2">{p.description}</p>
+                    )}
+                    {p.technologies && p.technologies.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {p.technologies.slice(0, 4).map((t) => (
+                          <span key={t} className="px-2 py-0.5 bg-white/5 rounded text-xs text-zinc-500">
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              );
+
+              if (p.projectUrl) {
+                return (
+                  <a
+                    key={p.id}
+                    href={p.projectUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cardClassName}
+                  >
+                    {inner}
+                  </a>
+                );
+              }
+
+              return (
+                <div key={p.id} className={cardClassName}>
+                  {inner}
                 </div>
-                <div className="p-4">
-                  <h4 className="text-white font-semibold mb-1">{p.title}</h4>
-                  {p.description && (
-                    <p className="text-zinc-400 text-sm line-clamp-2">{p.description}</p>
-                  )}
-                  {p.technologies && p.technologies.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {p.technologies.slice(0, 4).map((t) => (
-                        <span key={t} className="px-2 py-0.5 bg-white/5 rounded text-xs text-zinc-500">
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

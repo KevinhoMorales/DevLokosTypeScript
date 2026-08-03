@@ -47,7 +47,9 @@ Configura estas variables en tu plataforma de deployment. Copia [`.env.example`]
 
 \* Obligatoria para Academia, Eventos y Empresarial (datos Firestore).
 
-**`FIREBASE_ENV`:** Define la ruta Firestore `{env}/{env}/courses` y `{env}/{env}/events`. Usa `prod` en producción para leer los mismos datos que la app móvil en release.
+**`FIREBASE_ENV`:** Define la ruta Firestore `{env}/{env}/courses`, `{env}/{env}/events` y `{env}/{env}/users`. Usa `prod` en producción para leer los mismos datos que la app móvil en release.
+
+**Roles de cuenta:** los usuarios de la app tienen `accountRole` (`user`|`member`|`admin`) en `users/{uid}`. El panel `/admin` sigue autorizando con la colección `{env}/{env}/admin` (email). Ver `src/lib/account-roles.ts`.
 
 ### YouTube
 
