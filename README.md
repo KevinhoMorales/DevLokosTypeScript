@@ -14,10 +14,13 @@ Hub web oficial de **DevLokos** — comunidad de desarrolladores y creadores tec
 |------|------------|-----------------|
 | `/` | `PodcastSection` | YouTube (playlist podcast) |
 | `/podcast` | `PodcastSection` | YouTube |
-| `/tutoriales` | `ContentSection` | YouTube (playlists del canal) |
-| `/academia` | `AcademySection` | Firestore `courses` |
-| `/empresarial` | `EnterpriseSection` | Firestore `services` / `portfolio` + Web3Forms |
-| `/eventos` | `CommunitySection` | Firestore `events` |
+| `/tutorials` | `ContentSection` | YouTube (playlists del canal) |
+| `/academy` | `AcademySection` | Firestore `courses` |
+| `/products` | `ProductsSection` | Firestore `products` |
+| `/enterprise` | `EnterpriseSection` | Firestore `services` / `portfolio` + Web3Forms |
+| `/events` | `CommunitySection` | Firestore `events` |
+| `/terms` | `TermsContent` | Estático |
+| `/privacy` | `PrivacyContent` | Estático |
 
 La home (`/`) muestra el podcast directamente (equivalente funcional a `/podcast`).
 

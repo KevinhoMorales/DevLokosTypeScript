@@ -6,7 +6,7 @@ export const metadata = {
   description: "Servicios a medida, portfolio y formulario para iniciar un proyecto con DevLokos.",
 };
 
-export default function EmpresarialPage() {
+export default function EnterprisePage() {
   return (
     <div className={SECTION_PAGE_WRAPPER}>
       <EnterpriseSection />

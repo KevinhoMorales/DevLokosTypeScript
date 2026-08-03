@@ -6,12 +6,16 @@ interface LegalPageShellProps {
   children: ReactNode
 }
 
-/** Página legal con el look & feel del modal (fondo oscuro, títulos primary). */
+/** Página legal alineada al brand: negro / card #1A1A1A / acento naranja. */
 export function LegalPageShell({ title, children }: LegalPageShellProps) {
   return (
     <div className={SECTION_PAGE_WRAPPER}>
       <div className={`${SECTION_CONTAINER} max-w-4xl`}>
-        <article className="rounded-2xl border border-white/10 bg-[#0D1117] shadow-2xl overflow-hidden">
+        <article className="rounded-2xl border border-primary/25 bg-card-bg shadow-[0_12px_40px_rgba(255,145,77,0.06)] overflow-hidden">
+          <div
+            aria-hidden
+            className="h-1 w-full bg-gradient-to-r from-primary via-primary/70 to-transparent"
+          />
           <header className="border-b border-white/10 px-6 md:px-8 py-5 md:py-6">
             <h1 className="text-2xl md:text-3xl font-bold text-primary">{title}</h1>
           </header>

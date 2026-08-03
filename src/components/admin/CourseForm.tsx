@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { adminJson } from '@/lib/admin-api';
 import { DIFFICULTIES, LEARNING_PATHS, type AdminCourse } from '@/lib/admin-types';
+import { difficultyLabel, learningPathLabel } from '@/lib/i18n-labels';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ImageUploadField } from '@/components/admin/ImageUploadField';
@@ -118,7 +119,7 @@ export function CourseForm({ course }: Props) {
             className="w-full h-10 rounded-md bg-black border border-white/10 px-3 text-sm"
           >
             {DIFFICULTIES.map((d) => (
-              <option key={d} value={d}>{d}</option>
+              <option key={d} value={d}>{difficultyLabel(d)}</option>
             ))}
           </select>
         </Field>
@@ -128,7 +129,7 @@ export function CourseForm({ course }: Props) {
         <div className="flex flex-wrap gap-2">
           {LEARNING_PATHS.map((p) => (
             <Chip key={p} type="button" active={paths.includes(p)} onClick={() => togglePath(p)}>
-              {p}
+              {learningPathLabel(p)}
             </Chip>
           ))}
         </div>

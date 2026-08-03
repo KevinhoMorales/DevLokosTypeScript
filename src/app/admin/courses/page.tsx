@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { adminJson } from '@/lib/admin-api';
 import type { AdminCourse } from '@/lib/admin-types';
+import { difficultyLabel } from '@/lib/i18n-labels';
 import { Button } from '@/components/ui/button';
 import { AppLoading } from '@/components/admin/AdminLoading';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -60,7 +61,7 @@ export default function AdminCoursesPage() {
                 <div className="min-w-0">
                   <p className="font-medium truncate">{c.title}</p>
                   <p className="text-xs text-zinc-500">
-                    {c.difficulty} · {c.duration || 0} min · {c.professor || 'Sin profesor'}
+                    {difficultyLabel(c.difficulty)} · {c.duration || 0} min · {c.professor || 'Sin profesor'}
                   </p>
                 </div>
                 <span

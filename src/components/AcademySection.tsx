@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { BookOpen, Check, ChevronDown, X, Clock, Layers, MessageCircle, SearchX, User } from 'lucide-react';
 import { analyticsEvents } from '@/lib/analytics';
+import { learningPathLabel } from '@/lib/i18n-labels';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionIntro } from '@/components/ui/SectionIntro';
 import { SectionHeader } from '@/components/ui/SectionHeader';
@@ -197,7 +198,7 @@ export default function AcademySection() {
                   <option value="">Ruta de aprendizaje</option>
                   {learningPaths.map((p) => (
                     <option key={p} value={p}>
-                      {p}
+                      {learningPathLabel(p)}
                     </option>
                   ))}
                 </select>
@@ -360,7 +361,7 @@ export default function AcademySection() {
                   <div className="flex flex-wrap gap-2 mb-4">
                     {selectedCourse.learningPaths.map((path) => (
                       <span key={path} className="px-2.5 py-1 bg-primary/15 text-primary rounded-lg text-xs font-medium border border-primary/30">
-                        {path}
+                        {learningPathLabel(path)}
                       </span>
                     ))}
                   </div>

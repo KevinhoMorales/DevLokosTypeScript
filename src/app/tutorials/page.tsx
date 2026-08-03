@@ -6,7 +6,7 @@ export const metadata = {
   description: "Vídeos tutoriales organizados por categorías. Búsqueda por título y contenido.",
 };
 
-export default function TutorialesPage() {
+export default function TutorialsPage() {
   return (
     <div className={SECTION_PAGE_WRAPPER}>
       <ContentSection />

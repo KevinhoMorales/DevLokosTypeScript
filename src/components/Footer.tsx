@@ -25,11 +25,11 @@ export default function Footer() {
             <Logo />
             <p className="text-zinc-500 text-sm">© {new Date().getFullYear()} DevLokos</p>
             <div className="flex flex-wrap justify-center md:justify-start gap-4 text-xs text-zinc-500">
-              <Link href="/terminos" className="hover:text-white transition-colors">
+              <Link href="/terms" className="hover:text-white transition-colors">
                 Términos de Servicio
               </Link>
               <span className="text-zinc-700">|</span>
-              <Link href="/privacidad" className="hover:text-white transition-colors">
+              <Link href="/privacy" className="hover:text-white transition-colors">
                 Política de Privacidad
               </Link>
             </div>

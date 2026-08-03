@@ -48,11 +48,13 @@ export function setUserProperty(name: string, value: string) {
 const ROUTE_TO_MODULE: Record<string, string> = {
   '/': 'home',
   '/podcast': 'podcast',
-  '/tutoriales': 'tutorials',
-  '/academia': 'academy',
-  '/productos': 'products',
-  '/empresarial': 'enterprise',
-  '/eventos': 'events',
+  '/tutorials': 'tutorials',
+  '/academy': 'academy',
+  '/products': 'products',
+  '/enterprise': 'enterprise',
+  '/events': 'events',
+  '/terms': 'terms',
+  '/privacy': 'privacy',
 };
 
 export function getModuleForPath(pathname: string): string {

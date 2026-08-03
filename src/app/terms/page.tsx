@@ -7,7 +7,7 @@ export const metadata = {
     "Términos y condiciones de uso de la aplicación DevLokos, desarrollada por DevLokos Enterprise.",
 }
 
-export default function TerminosPage() {
+export default function TermsPage() {
   return (
     <LegalPageShell title="Términos y Condiciones">
       <TermsContent />

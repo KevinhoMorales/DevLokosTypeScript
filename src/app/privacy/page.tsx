@@ -7,7 +7,7 @@ export const metadata = {
     "Política de privacidad de la aplicación DevLokos: recopilación, uso y protección de datos.",
 }
 
-export default function PrivacidadPage() {
+export default function PrivacyPage() {
   return (
     <LegalPageShell title="Política de Privacidad">
       <PrivacyContent />

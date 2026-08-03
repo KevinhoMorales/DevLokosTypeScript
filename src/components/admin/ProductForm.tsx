@@ -141,7 +141,7 @@ export function ProductForm({ item }: { item?: AdminProduct }) {
         {storeLinks.map((link, index) => (
           <div key={index} className="grid grid-cols-[1fr_2fr_auto] gap-2">
             <Input
-              placeholder="Label"
+              placeholder="Etiqueta"
               value={link.label}
               onChange={(e) => {
                 const next = [...storeLinks];

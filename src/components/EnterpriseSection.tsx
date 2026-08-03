@@ -60,7 +60,7 @@ const FALLBACK_SERVICES: Service[] = [
     description:
       'Productos y plataformas pensadas para tu operación, no plantillas genéricas.',
     icon: 'code',
-    features: ['Discovery y arquitectura', 'Desarrollo end-to-end', 'Entrega continua'],
+    features: ['Descubrimiento y arquitectura', 'Desarrollo de punta a punta', 'Entrega continua'],
   },
   {
     id: 'fallback-mobile',
@@ -68,7 +68,7 @@ const FALLBACK_SERVICES: Service[] = [
     description:
       'iOS y Android con foco en rendimiento, UX y mantenimiento a largo plazo.',
     icon: 'phone',
-    features: ['Flutter nativo-feel', 'Integraciones backend', 'Publicación en stores'],
+    features: ['Flutter con sensación nativa', 'Integraciones de backend', 'Publicación en tiendas'],
   },
   {
     id: 'fallback-consulting',
@@ -76,7 +76,7 @@ const FALLBACK_SERVICES: Service[] = [
     description:
       'Acompañamos a tu equipo en decisiones de stack, cloud y procesos.',
     icon: 'explore',
-    features: ['Auditoría técnica', 'Roadmap de producto', 'Mentoría a equipos'],
+    features: ['Auditoría técnica', 'Hoja de ruta del producto', 'Mentoría a equipos'],
   },
 ];
 

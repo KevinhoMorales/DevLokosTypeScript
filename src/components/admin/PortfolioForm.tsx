@@ -79,7 +79,7 @@ export function PortfolioForm({ item }: { item?: AdminPortfolio }) {
       </Field>
       <div className="grid grid-cols-2 gap-4">
         <Field label="Categoría">
-          <Input value={category} onChange={(e) => setCategory(e.target.value)} className="bg-black border-white/10" placeholder="Web, Mobile..." />
+          <Input value={category} onChange={(e) => setCategory(e.target.value)} className="bg-black border-white/10" placeholder="Web, Móvil…" />
         </Field>
         <Field label="Orden">
           <Input type="number" value={order} onChange={(e) => setOrder(e.target.value)} className="bg-black border-white/10" />
@@ -91,7 +91,7 @@ export function PortfolioForm({ item }: { item?: AdminPortfolio }) {
       <Field label="URL del proyecto">
         <Input value={projectUrl} onChange={(e) => setProjectUrl(e.target.value)} className="bg-black border-white/10" />
       </Field>
-      <Field label="URL case study">
+      <Field label="URL del caso de estudio">
         <Input value={caseStudyUrl} onChange={(e) => setCaseStudyUrl(e.target.value)} className="bg-black border-white/10" />
       </Field>
       <label className="flex items-center gap-2 text-sm">

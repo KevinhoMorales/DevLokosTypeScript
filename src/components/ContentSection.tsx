@@ -57,7 +57,7 @@ export default function ContentSection() {
       const list = Array.isArray(data.playlists) ? data.playlists : [];
       const apiError = typeof data.error === 'string' ? data.error : null;
       if (!res.ok) {
-        setErrorPlaylists(apiError || 'Error al cargar playlists');
+        setErrorPlaylists(apiError || 'Error al cargar las listas');
         setPlaylists([]);
         return;
       }
@@ -142,7 +142,7 @@ export default function ContentSection() {
   return (
     <section id="tutorials-section" className={`${SECTION_CONTAINER} bg-black`}>
       <SectionIntro>
-        Contenido práctico organizado por playlists. Aprende nuevas tecnologías con tutoriales enfocados en ejemplos reales y casos de uso.
+        Contenido práctico organizado por listas. Aprende nuevas tecnologías con tutoriales enfocados en ejemplos reales y casos de uso.
       </SectionIntro>
       {loadingPlaylists && (
           <LoadingSkeleton count={6} variant="video" />
@@ -150,7 +150,7 @@ export default function ContentSection() {
 
         {errorPlaylists && !loadingPlaylists && playlists.length === 0 && (
           <ErrorState
-            title={errorPlaylists.includes('.env') || errorPlaylists.includes('YOUTUBE') ? 'Configuración necesaria' : 'Error al cargar playlists'}
+            title={errorPlaylists.includes('.env') || errorPlaylists.includes('YOUTUBE') ? 'Configuración necesaria' : 'Error al cargar las listas'}
             message={errorPlaylists}
             onRetry={fetchPlaylists}
           />
@@ -245,7 +245,7 @@ export default function ContentSection() {
 
             {!loadingVideos && !errorVideos && tutorials.length === 0 && (
               <EmptyState
-                title="Esta playlist no tiene videos"
+                title="Esta lista no tiene videos"
                 subtitle={selectedPlaylist?.title}
               />
             )}

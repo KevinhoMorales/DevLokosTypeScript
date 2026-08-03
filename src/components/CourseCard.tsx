@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { learningPathLabel } from '@/lib/i18n-labels';
 
 export interface CourseCardData {
   id: string;
@@ -87,7 +88,7 @@ export function CourseCard({ course, onClick }: CourseCardProps) {
           <div className="flex flex-wrap gap-1.5 mt-auto">
             {course.learningPaths.slice(0, 3).map((path) => (
               <span key={path} className="px-2 py-0.5 bg-white/5 rounded text-xs text-zinc-400">
-                {path}
+                {learningPathLabel(path)}
               </span>
             ))}
           </div>

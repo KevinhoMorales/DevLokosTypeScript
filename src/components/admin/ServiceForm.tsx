@@ -72,7 +72,7 @@ export function ServiceForm({ service }: { service?: AdminService }) {
           <Input type="number" value={order} onChange={(e) => setOrder(e.target.value)} className="bg-black border-white/10" />
         </Field>
       </div>
-      <Field label="Features (una por línea)">
+      <Field label="Características (una por línea)">
         <textarea value={featuresText} onChange={(e) => setFeaturesText(e.target.value)} rows={5} className="w-full rounded-md bg-black border border-white/10 px-3 py-2 text-sm font-mono" />
       </Field>
       <label className="flex items-center gap-2 text-sm">

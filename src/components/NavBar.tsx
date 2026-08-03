@@ -9,11 +9,11 @@ import { Logo } from '@/components/Logo';
 
 const navLinks = [
   { href: '/podcast', label: 'Podcast' },
-  { href: '/tutoriales', label: 'Tutoriales' },
-  { href: '/academia', label: 'Academia' },
-  { href: '/productos', label: 'Productos' },
-  { href: '/empresarial', label: 'Empresarial' },
-  { href: '/eventos', label: 'Eventos' },
+  { href: '/tutorials', label: 'Tutoriales' },
+  { href: '/academy', label: 'Academia' },
+  { href: '/products', label: 'Productos' },
+  { href: '/enterprise', label: 'Empresarial' },
+  { href: '/events', label: 'Eventos' },
 ];
 
 function NavLink({ href, label, isActive }: { href: string; label: string; isActive: boolean }) {

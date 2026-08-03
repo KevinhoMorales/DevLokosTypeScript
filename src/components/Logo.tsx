@@ -15,7 +15,7 @@ export function Logo({ className = "", size = "sm" }: LogoProps) {
           <div className="relative h-24 w-auto">
             <Image
               src="/logo-transparent.png"
-              alt="DevLokos Logo"
+              alt="Logo de DevLokos"
               width={200}
               height={80}
               className="h-full w-auto object-contain"
@@ -27,7 +27,7 @@ export function Logo({ className = "", size = "sm" }: LogoProps) {
         <div className="relative h-8 w-auto">
           <Image
             src="/logo-transparent.png"
-            alt="DevLokos Logo"
+            alt="Logo de DevLokos"
             width={120}
             height={32}
             className="h-full w-auto object-contain"

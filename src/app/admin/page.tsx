@@ -24,7 +24,7 @@ const modules = [
   },
   {
     href: '/admin/portfolio',
-    title: 'Portfolio',
+    title: 'Portafolio',
     description: 'Proyectos destacados del módulo Empresarial.',
     icon: Layers,
   },

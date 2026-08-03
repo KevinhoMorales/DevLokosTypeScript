@@ -33,6 +33,17 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      { source: "/terminos", destination: "/terms", permanent: true },
+      { source: "/privacidad", destination: "/privacy", permanent: true },
+      { source: "/productos", destination: "/products", permanent: true },
+      { source: "/tutoriales", destination: "/tutorials", permanent: true },
+      { source: "/academia", destination: "/academy", permanent: true },
+      { source: "/empresarial", destination: "/enterprise", permanent: true },
+      { source: "/eventos", destination: "/events", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

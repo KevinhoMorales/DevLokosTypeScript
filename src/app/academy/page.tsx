@@ -6,7 +6,7 @@ export const metadata = {
   description: "Cursos con rutas de aprendizaje y nivel de dificultad. Inscripción directa por mensajería.",
 };
 
-export default function AcademiaPage() {
+export default function AcademyPage() {
   return (
     <div className={SECTION_PAGE_WRAPPER}>
       <AcademySection />

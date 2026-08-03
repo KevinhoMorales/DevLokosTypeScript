@@ -6,7 +6,7 @@ export const metadata = {
   description: "Eventos, talleres y encuentros en vivo. Próximos y pasados.",
 };
 
-export default function EventosPage() {
+export default function EventsPage() {
   return (
     <div className={SECTION_PAGE_WRAPPER}>
       <CommunitySection />

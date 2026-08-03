@@ -42,7 +42,7 @@ export function ImageUploadField({ value, onChange, token, type, entityId = 'new
       <label className="text-sm text-zinc-400">Imagen</label>
       {value ? (
         <div className="relative w-full max-w-sm h-40 rounded-xl overflow-hidden border border-white/10 bg-zinc-900">
-          <Image src={value} alt="Cover" fill className="object-cover" unoptimized sizes="400px" />
+          <Image src={value} alt="Portada" fill className="object-cover" unoptimized sizes="400px" />
         </div>
       ) : (
         <div className="w-full max-w-sm h-40 rounded-xl border border-dashed border-white/20 flex items-center justify-center text-zinc-500 text-sm">
